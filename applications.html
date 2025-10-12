@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-World Applications - Digital Communication 101</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Applications page specific dark mode styling -->
+    <style>
+        /* Dark mode styles for applications.html only */
+        html.dark-mode {
+            color: #e2e8f0;
+            background-color: #0f172a;
+            /* Ensure full-page dotted background in dark mode */
+            background-image: radial-gradient(#334155 1.1px, #0f172a 1.1px);
+            background-size: 22px 22px;
+            background-position: 0 0;
+        }
+
+        html.dark-mode body {
+            background-color: #0f172a;
+            color: #e2e8f0;
+            /* Mirror the dark dotted background on body as well to avoid partial coverage */
+            background-image: radial-gradient(#334155 1.1px, #0f172a 1.1px);
+            background-size: 22px 22px;
+            background-position: 0 0;
+        }
+
+        /* Headers and navigation */
+        html.dark-mode header {
+            background-color: rgba(15, 23, 42, 0.8) !important;
+            backdrop-filter: blur(12px);
+        }
+
+        html.dark-mode h1, 
+        html.dark-mode h2, 
+        html.dark-mode h3, 
+        html.dark-mode h4, 
+        html.dark-mode h5 {
+            color: #f1f5f9;
+        }
+
+        /* Cards and sections */
+        html.dark-mode .bg-white {
+            background-color: #1e293b !important;
+        }
+
+        html.dark-mode .bg-slate-50 {
+            background-color: #334155 !important;
+        }
+
+        html.dark-mode .bg-slate-100 {
+            background-color: #475569 !important;
+        }
+
+        html.dark-mode .bg-slate-800 {
+            background-color: #0f172a !important;
+        }
+
+        /* Text colors */
+        html.dark-mode .text-slate-600 {
+            color: #cbd5e1 !important;
+        }
+
+        html.dark-mode .text-slate-500 {
+            color: #94a3b8 !important;
+        }
+
+        html.dark-mode .text-slate-400 {
+            color: #64748b !important;
+        }
+
+        html.dark-mode .text-slate-800 {
+            color: #f1f5f9 !important;
+        }
+
+        html.dark-mode .text-slate-700 {
+            color: #e2e8f0 !important;
+        }
+
+        /* SVG icons */
+        html.dark-mode svg {
+            color: inherit !important;
+        }
+
+        html.dark-mode .text-indigo-600 {
+            color: #818cf8 !important;
+        }
+
+        html.dark-mode .text-blue-600 {
+            color: #60a5fa !important;
+        }
+
+        html.dark-mode .text-green-600 {
+            color: #4ade80 !important;
+        }
+
+        html.dark-mode .text-purple-600 {
+            color: #c084fc !important;
+        }
+
+        html.dark-mode .text-red-600 {
+            color: #f87171 !important;
+        }
+
+        html.dark-mode .text-cyan-600 {
+            color: #22d3ee !important;
+        }
+
+        html.dark-mode .text-yellow-600 {
+            color: #fbbf24 !important;
+        }
+
+        /* Gradient backgrounds */
+        html.dark-mode .bg-gradient-to-br.from-red-50.to-pink-50 {
+            background: linear-gradient(to bottom right, #334155, #475569) !important;
+        }
+
+        html.dark-mode .bg-gradient-to-br.from-blue-50.to-indigo-50 {
+            background: linear-gradient(to bottom right, #334155, #475569) !important;
+        }
+
+        html.dark-mode .bg-gradient-to-br.from-green-50.to-emerald-50 {
+            background: linear-gradient(to bottom right, #334155, #475569) !important;
+        }
+
+        html.dark-mode .bg-gradient-to-br.from-yellow-50.to-orange-50 {
+            background: linear-gradient(to bottom right, #334155, #475569) !important;
+        }
+
+        /* Background colors */
+        html.dark-mode .bg-blue-100 {
+            background-color: #1e3a8a !important;
+        }
+
+        html.dark-mode .bg-green-100 {
+            background-color: #14532d !important;
+        }
+
+        html.dark-mode .bg-purple-100 {
+            background-color: #581c87 !important;
+        }
+
+        html.dark-mode .bg-red-100 {
+            background-color: #7f1d1d !important;
+        }
+
+        html.dark-mode .bg-cyan-100 {
+            background-color: #164e63 !important;
+        }
+
+        html.dark-mode .bg-indigo-100 {
+            background-color: #312e81 !important;
+        }
+
+        /* Borders */
+        html.dark-mode .border {
+            border-color: #475569 !important;
+        }
+
+        html.dark-mode .border-slate-200 {
+            border-color: #475569 !important;
+        }
+
+        html.dark-mode .border-slate-300 {
+            border-color: #64748b !important;
+        }
+
+        html.dark-mode .border-l-4.border-purple-500 {
+            border-left-color: #c084fc !important;
+        }
+
+        html.dark-mode .border-l-4.border-blue-500 {
+            border-left-color: #60a5fa !important;
+        }
+
+        /* Footer */
+        html.dark-mode footer {
+            background-color: #1e293b !important;
+        }
+    </style>
+
+    <meta name="theme-color" content="#dfdff3">
+    <!-- Apply dark mode class ASAP before paint to avoid flashes/overscroll white -->
+    <script>
+        (function() {
+            try {
+                var saved = localStorage.getItem('dark-mode');
+                var shouldDark = saved === 'true' || (saved === null && window.matchMedia('(prefers-color-scheme: dark)').matches);
+                if (shouldDark) {
+                    document.documentElement.classList.add('dark-mode');
+                    // Also tag body so global dark background pattern applies fully
+                    if (document.body) {
+                        document.body.classList.add('dark-mode');
+                    } else {
+                        document.addEventListener('DOMContentLoaded', function() {
+                            document.body.classList.add('dark-mode');
+                        });
+                    }
+                    var meta = document.querySelector('meta[name="theme-color"]');
+                    if (meta) meta.setAttribute('content', '#0f172a');
+                }
+            } catch (e) {}
+        })();
+    </script>
+</head>
+<body class="text-slate-800">
+    <!-- Header -->
+    <header class="bg-white/80 backdrop-blur-lg shadow-sm sticky top-0 z-50">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <a href="index.html" class="text-2xl font-bold text-indigo-600">Digital Communication</a>
+                <span class="text-xs text-slate-500">Applications</span>
+            </div>
+            <div class="flex items-center space-x-4">
+                <a href="index.html" class="flex items-center text-slate-600 hover:text-indigo-600 transition-colors">
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                    </svg>
+                    Back to Main
+                </a>
+                <a href="resources.html" class="flex items-center bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition-colors">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C20.168 18.477 18.582 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                    </svg>
+                    Resources
+                </a>
+                <!-- Dark Mode Toggle -->
+                <button id="darkModeToggle" 
+                        class="bg-slate-800 text-white px-3 py-2 rounded-full shadow-lg hover:bg-slate-900 transition-all duration-300 flex items-center space-x-2" 
+                        aria-label="Toggle dark mode"
+                        title="Switch theme (Ctrl+D)">
+                    <span class="text-sm">🌙</span>
+                    <span class="hidden xl:inline text-xs font-medium">Dark</span>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+<main class="container mx-auto px-6 py-12">
+    <!-- Hero Section -->
+    <section class="text-center mb-20 relative">
+        <h1 class="flex items-center justify-center text-4xl font-bold text-indigo-600 mb-4">
+            <svg class="w-10 h-10 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0" />
+            </svg>
+            Real-World Applications
+        </h1>
+        <p class="text-lg text-slate-600 max-w-3xl mx-auto">
+            Discover how digital communication and signal processing concepts power the technology around us every day.
+            From your smartphone to satellite communications, these principles are everywhere.
+        </p>
+    </section>
+
+    <!-- Applications Grid -->
+    <div class="grid gap-12 mt-10 relative z-10">
+        <!-- Cellular & Mobile Communications -->
+        <section class="bg-white p-8 rounded-xl shadow-lg relative z-20">
+            <div class="flex items-center mb-6">
+                <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mr-4">
+                    <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                    </svg>
+                </div>
+                <h3 class="text-2xl font-bold text-slate-800">Cellular & Mobile Communications</h3>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-6">
+                <div>
+                    <h4 class="text-xl font-semibold mb-3 text-indigo-600">4G/LTE Networks</h4>
+                    <p class="text-slate-600 mb-4">
+                        Modern cellular networks use advanced modulation schemes and signal processing techniques for high-speed data transmission.
+                    </p>
+                    <ul class="space-y-2 text-slate-600">
+                        <li class="flex items-start">
+                            <span class="w-2 h-2 bg-blue-500 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                            <span><strong>OFDM Modulation:</strong> Orthogonal Frequency Division Multiplexing for spectrum efficiency</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="w-2 h-2 bg-blue-500 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                            <span><strong>MIMO Technology:</strong> Multiple antennas for increased capacity</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="w-2 h-2 bg-blue-500 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                            <span><strong>Adaptive Modulation:</strong> QPSK to 64-QAM based on channel conditions</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="text-xl font-semibold mb-3 text-indigo-600">5G New Radio (NR)</h4>
+                    <p class="text-slate-600 mb-4">
+                        Next-generation wireless technology pushing the boundaries of communication systems.
+                    </p>
+                    <ul class="space-y-2 text-slate-600">
+                        <li class="flex items-start">
+                            <span class="w-2 h-2 bg-blue-500 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                            <span><strong>Massive MIMO:</strong> Up to 256 antenna elements</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="w-2 h-2 bg-blue-500 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                            <span><strong>Beamforming:</strong> Directed signal transmission</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="w-2 h-2 bg-blue-500 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                            <span><strong>256-QAM:</strong> High-order modulation for ultra-high speeds</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+ 
+
+            <!-- WiFi & Wireless LANs -->
+            <section class="bg-white p-8 rounded-xl shadow-lg">
+                <div class="flex items-center mb-6">
+                    <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mr-4">
+                        <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold text-slate-800">WiFi & Wireless LANs</h3>
+                </div>
+                
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="p-4 bg-slate-50 rounded-lg">
+                        <h4 class="font-semibold text-green-600 mb-2">WiFi 6 (802.11ax)</h4>
+                        <p class="text-sm text-slate-600 mb-3">Latest WiFi standard with enhanced performance</p>
+                        <ul class="text-xs text-slate-600 space-y-1">
+                            <li>• OFDMA for multiple users</li>
+                            <li>• 1024-QAM modulation</li>
+                            <li>• Up to 9.6 Gbps throughput</li>
+                            <li>• Target Wake Time (TWT)</li>
+                        </ul>
+                    </div>
+                    <div class="p-4 bg-slate-50 rounded-lg">
+                        <h4 class="font-semibold text-green-600 mb-2">WiFi 5 (802.11ac)</h4>
+                        <p class="text-sm text-slate-600 mb-3">Widely deployed gigabit WiFi</p>
+                        <ul class="text-xs text-slate-600 space-y-1">
+                            <li>• 256-QAM modulation</li>
+                            <li>• 80/160 MHz channels</li>
+                            <li>• MU-MIMO support</li>
+                            <li>• Up to 3.5 Gbps</li>
+                        </ul>
+                    </div>
+                    <div class="p-4 bg-slate-50 rounded-lg">
+                        <h4 class="font-semibold text-green-600 mb-2">Legacy Standards</h4>
+                        <p class="text-sm text-slate-600 mb-3">Foundation technologies</p>
+                        <ul class="text-xs text-slate-600 space-y-1">
+                            <li>• 802.11n: MIMO introduction</li>
+                            <li>• 802.11g: OFDM at 2.4GHz</li>
+                            <li>• 802.11b: DSSS/CCK</li>
+                            <li>• 802.11a: First OFDM</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Satellite Communications -->
+            <section class="bg-white p-8 rounded-xl shadow-lg">
+                <div class="flex items-center mb-6">
+                    <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mr-4">
+                        <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold text-slate-800">Satellite Communications</h3>
+                </div>
+                
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div>
+                        <h4 class="text-lg font-semibold mb-3 text-purple-600">Digital Television Broadcasting</h4>
+                        <div class="space-y-4">
+                            <div class="border-l-4 border-purple-500 pl-4">
+                                <h5 class="font-medium">DVB-S2/S2X</h5>
+                                <p class="text-sm text-slate-600">Advanced satellite broadcasting with adaptive coding and modulation</p>
+                            </div>
+                            <div class="border-l-4 border-purple-500 pl-4">
+                                <h5 class="font-medium">LDPC + BCH Coding</h5>
+                                <p class="text-sm text-slate-600">Forward error correction approaching Shannon limit</p>
+                            </div>
+                            <div class="border-l-4 border-purple-500 pl-4">
+                                <h5 class="font-medium">APSK Modulation</h5>
+                                <p class="text-sm text-slate-600">Amplitude and Phase Shift Keying for spectrum efficiency</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 class="text-lg font-semibold mb-3 text-purple-600">Global Navigation Systems</h4>
+                        <div class="space-y-4">
+                            <div class="border-l-4 border-purple-500 pl-4">
+                                <h5 class="font-medium">GPS L1/L2/L5</h5>
+                                <p class="text-sm text-slate-600">BPSK modulation with Gold code spreading</p>
+                            </div>
+                            <div class="border-l-4 border-purple-500 pl-4">
+                                <h5 class="font-medium">Galileo E1/E5/E6</h5>
+                                <p class="text-sm text-slate-600">European GNSS with BOC modulation</p>
+                            </div>
+                            <div class="border-l-4 border-purple-500 pl-4">
+                                <h5 class="font-medium">GLONASS</h5>
+                                <p class="text-sm text-slate-600">Russian system using FDMA</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Audio & Video Streaming -->
+            <section class="bg-white p-8 rounded-xl shadow-lg">
+                <div class="flex items-center mb-6">
+                    <div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center mr-4">
+                        <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1.586a1 1 0 01.707.293l2.414 2.414a1 1 0 00.707.293H15M9 10V9a2 2 0 012-2h2a2 2 0 012 2v1M9 10v5a2 2 0 002 2h2a2 2 0 002-2v-5"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold text-slate-800">Audio & Video Streaming</h3>
+                </div>
+                
+                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="p-4 bg-gradient-to-br from-red-50 to-pink-50 rounded-lg">
+                        <h4 class="font-semibold text-red-600 mb-2">Digital Audio</h4>
+                        <ul class="text-sm text-slate-600 space-y-1">
+                            <li>• CD: 44.1 kHz, 16-bit</li>
+                            <li>• MP3: Perceptual coding</li>
+                            <li>• AAC: Advanced audio codec</li>
+                            <li>• Dolby Digital: 5.1 surround</li>
+                        </ul>
+                    </div>
+                    <div class="p-4 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg">
+                        <h4 class="font-semibold text-blue-600 mb-2">Video Compression</h4>
+                        <ul class="text-sm text-slate-600 space-y-1">
+                            <li>• H.264/AVC: Ubiquitous codec</li>
+                            <li>• H.265/HEVC: 50% bitrate savings</li>
+                            <li>• AV1: Royalty-free future</li>
+                            <li>• DCT: Transform coding</li>
+                        </ul>
+                    </div>
+                    <div class="p-4 bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg">
+                        <h4 class="font-semibold text-green-600 mb-2">Streaming Protocols</h4>
+                        <ul class="text-sm text-slate-600 space-y-1">
+                            <li>• HLS: HTTP Live Streaming</li>
+                            <li>• DASH: Dynamic adaptive</li>
+                            <li>• WebRTC: Real-time comm</li>
+                            <li>• RTMP: Live broadcasting</li>
+                        </ul>
+                    </div>
+                    <div class="p-4 bg-gradient-to-br from-yellow-50 to-orange-50 rounded-lg">
+                        <h4 class="font-semibold text-yellow-600 mb-2">Quality Metrics</h4>
+                        <ul class="text-sm text-slate-600 space-y-1">
+                            <li>• PSNR: Peak signal-to-noise</li>
+                            <li>• SSIM: Structural similarity</li>
+                            <li>• VMAF: Video quality assessment</li>
+                            <li>• QoE: Quality of experience</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- IoT & Sensor Networks -->
+            <section class="bg-white p-8 rounded-xl shadow-lg">
+                <div class="flex items-center mb-6">
+                    <div class="w-12 h-12 bg-cyan-100 rounded-lg flex items-center justify-center mr-4">
+                        <svg class="w-6 h-6 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9-9a9 9 0 00-9 9m0 0a9 9 0 919-9"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold text-slate-800">IoT & Sensor Networks</h3>
+                </div>
+                
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="p-4 border rounded-lg">
+                        <h4 class="font-semibold text-cyan-600 mb-3">Low Power Wide Area Networks (LPWAN)</h4>
+                        <div class="space-y-3">
+                            <div>
+                                <h5 class="font-medium text-sm">LoRa/LoRaWAN</h5>
+                                <p class="text-xs text-slate-600">CSS modulation, 15km range</p>
+                            </div>
+                            <div>
+                                <h5 class="font-medium text-sm">Sigfox</h5>
+                                <p class="text-xs text-slate-600">Ultra-narrowband, 50km range</p>
+                            </div>
+                            <div>
+                                <h5 class="font-medium text-sm">NB-IoT</h5>
+                                <p class="text-xs text-slate-600">Cellular IoT standard</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-4 border rounded-lg">
+                        <h4 class="font-semibold text-cyan-600 mb-3">Short Range Communications</h4>
+                        <div class="space-y-3">
+                            <div>
+                                <h5 class="font-medium text-sm">Bluetooth Low Energy</h5>
+                                <p class="text-xs text-slate-600">GFSK modulation, mesh networking</p>
+                            </div>
+                            <div>
+                                <h5 class="font-medium text-sm">ZigBee</h5>
+                                <p class="text-xs text-slate-600">IEEE 802.15.4, DSSS</p>
+                            </div>
+                            <div>
+                                <h5 class="font-medium text-sm">Thread</h5>
+                                <p class="text-xs text-slate-600">IPv6 mesh protocol</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-4 border rounded-lg">
+                        <h4 class="font-semibold text-cyan-600 mb-3">Industrial Applications</h4>
+                        <div class="space-y-3">
+                            <div>
+                                <h5 class="font-medium text-sm">SCADA Systems</h5>
+                                <p class="text-xs text-slate-600">Supervisory control and data acquisition</p>
+                            </div>
+                            <div>
+                                <h5 class="font-medium text-sm">Smart Grid</h5>
+                                <p class="text-xs text-slate-600">Power line communication (PLC)</p>
+                            </div>
+                            <div>
+                                <h5 class="font-medium text-sm">Asset Tracking</h5>
+                                <p class="text-xs text-slate-600">RFID, NFC technologies</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Future Technologies -->
+            <section class="bg-white p-8 rounded-xl shadow-lg">
+                <div class="flex items-center mb-6">
+                    <div class="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center mr-4">
+                        <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold text-slate-800">Emerging Technologies</h3>
+                </div>
+                
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div>
+                        <h4 class="text-lg font-semibold mb-4 text-indigo-600">Quantum Communications</h4>
+                        <div class="space-y-3">
+                            <div class="flex items-start">
+                                <div class="w-3 h-3 bg-indigo-500 rounded-full mt-1 mr-3 flex-shrink-0"></div>
+                                <div>
+                                    <h5 class="font-medium">Quantum Key Distribution (QKD)</h5>
+                                    <p class="text-sm text-slate-600">Unbreakable cryptographic keys using quantum mechanics</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start">
+                                <div class="w-3 h-3 bg-indigo-500 rounded-full mt-1 mr-3 flex-shrink-0"></div>
+                                <div>
+                                    <h5 class="font-medium">Quantum Internet</h5>
+                                    <p class="text-sm text-slate-600">Quantum entanglement for global secure communications</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start">
+                                <div class="w-3 h-3 bg-indigo-500 rounded-full mt-1 mr-3 flex-shrink-0"></div>
+                                <div>
+                                    <h5 class="font-medium">Quantum Repeaters</h5>
+                                    <p class="text-sm text-slate-600">Extending quantum communication range</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 class="text-lg font-semibold mb-4 text-indigo-600">6G & Beyond</h4>
+                        <div class="space-y-3">
+                            <div class="flex items-start">
+                                <div class="w-3 h-3 bg-indigo-500 rounded-full mt-1 mr-3 flex-shrink-0"></div>
+                                <div>
+                                    <h5 class="font-medium">Terahertz Communications</h5>
+                                    <p class="text-sm text-slate-600">100 GHz to 3 THz for ultra-high bandwidth</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start">
+                                <div class="w-3 h-3 bg-indigo-500 rounded-full mt-1 mr-3 flex-shrink-0"></div>
+                                <div>
+                                    <h5 class="font-medium">Holographic Communications</h5>
+                                    <p class="text-sm text-slate-600">3D holographic data transmission</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start">
+                                <div class="w-3 h-3 bg-indigo-500 rounded-full mt-1 mr-3 flex-shrink-0"></div>
+                                <div>
+                                    <h5 class="font-medium">AI-Native Networks</h5>
+                                    <p class="text-sm text-slate-600">Machine learning integrated into physical layer</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <footer class="bg-slate-100 py-12">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-8">
+                <h3 class="text-xl font-bold text-slate-800 mb-4">Connect with the Creator</h3>
+                <div class="flex justify-center space-x-4 flex-wrap gap-2">
+                    <a href="https://www.linkedin.com/in/affan-danish-08a144353/" target="_blank" 
+                    class="group bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl transition-all duration-300 flex items-center space-x-3 transform hover:scale-105 shadow-lg hover:shadow-xl">
+                        <svg class="w-5 h-5 group-hover:rotate-12 transition-transform" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                        </svg>
+                        <div class="text-left">
+                            <div class="font-semibold">LinkedIn</div>
+                            <div class="text-xs opacity-80">Professional Network</div>
+                        </div>
+                    </a>
+
+                    <a href="mailto:Affan2304788@st.jmi.ac.in" 
+                    class="group bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-xl transition-all duration-300 flex items-center space-x-3 transform hover:scale-105 shadow-lg hover:shadow-xl">
+                        <svg class="w-5 h-5 group-hover:bounce" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-.904.732-1.636 1.636-1.636h.917l9.447 7.096 9.447-7.096h.917A1.636 1.636 0 0 1 24 5.457z"/>
+                        </svg>
+                        <div class="text-left">
+                            <div class="font-semibold">Email</div>
+                            <div class="text-xs opacity-80">Direct Contact</div>
+                        </div>
+                    </a>
+
+                    <a href="https://x.com/AffanMhz" target="_blank" 
+                    class="group bg-sky-500 hover:bg-sky-600 text-white px-6 py-3 rounded-xl transition-all duration-300 flex items-center space-x-3 transform hover:scale-105 shadow-lg hover:shadow-xl">
+                        <svg class="w-5 h-5 group-hover:rotate-12 transition-transform" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
+                        </svg>
+                        <div class="text-left">
+                            <div class="font-semibold">Twitter/X</div>
+                            <div class="text-xs opacity-80">Latest Updates</div>
+                        </div>
+                    </a>
+
+                    <a href="https://forms.gle/Yiuq2CYsoSZvgQ1RA" target="_blank" 
+                    class="group bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-xl transition-all duration-300 flex items-center space-x-3 transform hover:scale-105 shadow-lg hover:shadow-xl">
+                        <svg class="w-5 h-5 group-hover:pulse" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                        </svg>
+                        <div class="text-left">
+                            <div class="font-semibold">Feedback</div>
+                            <div class="text-xs opacity-80">Share Your Thoughts</div>
+                        </div>
+                    </a>
+
+                </div>
+                <div class="mt-6">
+                    <p class="text-slate-600 italic">"Per aspera ad astra" - Through adversity to the stars ⭐</p>
+                </div>
+            </div>
+
+            <div class="border-t border-slate-300 pt-8 text-center">
+                <p class="text-slate-600 mb-2">A learning resource on Digital Communication & Digital Signal Processing</p>
+                <p class="text-slate-800 font-semibold">Created with ❤️ by <a href="https://www.linkedin.com/in/affan-danish-08a144353/" target="_blank" class="text-indigo-600 hover:text-indigo-800 transition-colors">Affan Danish</a></p>
+                <p class="text-xs text-slate-500 mt-2">© 2025 Affan Danish. All Rights Reserved.</p>
+                <p class="text-xs text-slate-400 mt-1">JMI | Electronics & Communication Engineering</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

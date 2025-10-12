@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gram-Schmidt Orthonormalization - Digital Communication 101</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.11.0/math.min.js"></script>
+    
+    <!-- Favicon links -->
+    <link rel="shortcut icon" href="../favicon.ico" type="image/x-icon">
+    <link rel="icon" type="image/png" sizes="32x32" href="../favicon.png?v=2">
+    <link rel="icon" type="image/png" sizes="16x16" href="../favicon.png?v=2">
+    <link rel="icon" type="image/svg+xml" href="../favicon.png?v=2">
+    <link rel="apple-touch-icon" href="../favicon.png?v=2">
+    <link rel="icon" sizes="192x192" href="../favicon.png?v=2">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Link shared styles for dark mode support -->
+    <link rel="stylesheet" href="../styles.css">
+    
+    <meta name="color-scheme" content="light dark">
+    <meta name="theme-color" content="#dfdff3">
+    <script>
+      (function() {
+        try {
+          var saved = localStorage.getItem('dark-mode');
+          var shouldDark = saved === 'true' || (saved === null && window.matchMedia('(prefers-color-scheme: dark)').matches);
+          if (shouldDark) {
+            document.documentElement.classList.add('dark-mode');
+            document.documentElement.style.colorScheme = 'dark';
+            var meta = document.querySelector('meta[name="theme-color"]');
+            if (meta) meta.setAttribute('content', '#0f172a');
+          }
+        } catch (e) {}
+      })();
+    </script>
+
+    <style>
+        /* Full page dotted background - exactly matching index_old.html */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+
+            /* Base color and pattern */
+            background-color: #dfdff3; /* soft pastel lavender */
+            background-image: radial-gradient(#9397db 1.1px, #FFFFFF 1.1px);
+            background-size: 22px 22px; /* distance between dots */
+            /* Optional: stagger effect if you want */
+            background-position: 0 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .latex {
+            font-family: "Times New Roman", Times, serif;
+            font-style: italic;
+        }
+
+        section {
+            margin-bottom: 2rem;
+        }
+
+        /* Custom styles for interactive elements */
+        .example-btn {
+            transition: all 0.3s ease;
+            transform: translateY(0);
+        }
+
+        .example-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .example-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .step {
+            transition: all 0.3s ease;
+        }
+
+        .step:hover {
+            transform: translateX(5px);
+        }
+
+        /* Canvas styling */
+        #signalCanvas {
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+            background: white;
+        }
+
+        /* Waveform canvases */
+        canvas {
+            border: 1px solid #e2e8f0;
+            border-radius: 0.375rem;
+            background: white;
+        }
+
+        /* Performance table styling */
+        .comparison-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .comparison-table th {
+            background-color: #f8fafc;
+            font-weight: 600;
+        }
+
+        /* Example info panel */
+        .example-info-panel {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .example-info-panel h3 {
+            margin-bottom: 0.75rem;
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .example-info-panel h4 {
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .properties-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 0.75rem;
+            margin-top: 0.5rem;
+        }
+
+        .property-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0.5rem;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+        }
+
+        /* Fix input fields in light mode */
+        input, select, textarea {
+            background-color: white !important;
+            color: #0f172a !important; /* slate-900 */
+            border-color: #cbd5e1 !important; /* slate-300 */
+        }
+
+        /* Dark mode input overrides */
+        html.dark-mode input,
+        html.dark-mode select,
+        html.dark-mode textarea {
+            background-color: #334155 !important; /* slate-700 */
+            border-color: #475569 !important; /* slate-600 */
+            color: #e2e8f0 !important; /* slate-200 */
+        }
+
+        html.dark-mode input:focus,
+        html.dark-mode select:focus,
+        html.dark-mode textarea:focus {
+            border-color: #6366f1 !important; /* indigo-500 */
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1) !important;
+        }
+
+        /* Comprehensive dark mode fixes for Gram-Schmidt page */
+        html.dark-mode {
+            background-color: #0f172a !important;
+            background-image: radial-gradient(#334155 1.1px, transparent 1.1px) !important;
+        }
+
+        html.dark-mode body {
+            background-color: #0f172a !important;
+            background-image: radial-gradient(#334155 1.1px, transparent 1.1px) !important;
+            color: #e2e8f0 !important;
+        }
+
+        /* Fix table text visibility */
+        html.dark-mode .comparison-table table {
+            background-color: #1e293b !important;
+            color: #e2e8f0 !important;
+        }
+
+        html.dark-mode .comparison-table th {
+            background-color: #334155 !important;
+            color: #f1f5f9 !important;
+            border-color: #475569 !important;
+        }
+
+        html.dark-mode .comparison-table td {
+            background-color: #1e293b !important;
+            color: #cbd5e1 !important;
+            border-color: #475569 !important;
+        }
+
+        /* Fix canvas backgrounds for better visibility */
+        html.dark-mode canvas {
+            background-color: #1e293b !important;
+            border-color: #475569 !important;
+        }
+
+        /* Vector input container width fix */
+        .vector-inputs {
+            max-width: 100% !important;
+            overflow-x: hidden !important;
+        }
+
+        .vector-input {
+            flex-wrap: wrap !important;
+            min-width: 0 !important;
+        }
+
+        .vector-input input {
+            min-width: 60px !important;
+            max-width: 80px !important;
+        }
+
+        /* Signal input containers - prevent overflow */
+        .bg-slate-50 {
+            min-width: 0 !important;
+            width: 100% !important;
+        }
+
+        .bg-slate-50 .flex {
+            min-width: 0 !important;
+            width: 100% !important;
+        }
+
+        .bg-slate-50 .flex input {
+            min-width: 0 !important;
+            width: 100% !important;
+            max-width: none !important;
+            flex: 1 1 0% !important;
+        }
+
+        /* Ensure parent container has proper width */
+        .lg\:col-span-1 {
+            min-width: 280px !important;
+        }
+
+        /* Input flex container improvements */
+        .flex.gap-2 {
+            display: flex !important;
+            gap: 0.5rem !important;
+            width: 100% !important;
+            min-width: 0 !important;
+        }
+
+        .flex.gap-2 input[type="number"] {
+            flex: 1 1 50% !important;
+            min-width: 0 !important;
+            width: auto !important;
+            box-sizing: border-box !important;
+        }
+
+        /* Dark mode signal input container fixes */
+        html.dark-mode .bg-slate-50 {
+            background-color: #334155 !important; /* slate-700 */
+            border-color: #475569 !important; /* slate-600 */
+        }
+
+        html.dark-mode .bg-slate-50 label {
+            color: #e2e8f0 !important; /* slate-200 */
+        }
+
+        /* Dark mode text color fixes */
+        html.dark-mode .text-slate-600,
+        html.dark-mode .text-slate-500,
+        html.dark-mode .text-slate-400 {
+            color: #cbd5e1 !important;
+        }
+
+        html.dark-mode .text-slate-800,
+        html.dark-mode .text-slate-700 {
+            color: #e2e8f0 !important;
+        }
+
+        html.dark-mode .text-indigo-600 {
+            color: #818cf8 !important;
+        }
+
+        /* Step computation display fixes */
+        html.dark-mode #stepsOutput {
+            background-color: #1e293b !important;
+            color: #e2e8f0 !important;
+        }
+
+        html.dark-mode .step {
+            background-color: #334155 !important;
+            color: #e2e8f0 !important;
+            border-left-color: #818cf8 !important;
+        }
+
+        html.dark-mode .step-title {
+            color: #f1f5f9 !important;
+        }
+
+        html.dark-mode .step-content {
+            color: #cbd5e1 !important;
+        }
+
+        /* Waveform controls and theory sections */
+        html.dark-mode .waveform-theory {
+            background-color: #1e293b !important;
+            color: #e2e8f0 !important;
+            border-left-color: #818cf8 !important;
+        }
+
+        html.dark-mode .waveform-theory h4,
+        html.dark-mode .waveform-theory p,
+        html.dark-mode .waveform-theory div {
+            color: #e2e8f0 !important;
+        }
+
+        html.dark-mode .formula-box {
+            background-color: #0f172a !important;
+            color: #e2e8f0 !important;
+            border: 1px solid #475569 !important;
+        }
+
+        html.dark-mode .phase-mapping {
+            color: #e2e8f0 !important;
+        }
+
+        html.dark-mode .theory-points li {
+            color: #e2e8f0 !important;
+        }
+
+        html.dark-mode .theory-points li::before {
+            color: #818cf8 !important;
+        }
+
+        /* Fix specific theory section text readability */
+        html.dark-mode .theory-points,
+        html.dark-mode .formula-line,
+        html.dark-mode .phase-mapping div,
+        html.dark-mode .eight-psk-mapping {
+            color: #e2e8f0 !important;
+        }
+
+        /* Target specific PSK theory containers */
+        html.dark-mode .bg-purple-50 .text-slate-600,
+        html.dark-mode .bg-emerald-50 .text-slate-600,
+        html.dark-mode .bg-blue-50 .text-slate-600 {
+            color: #1f2937 !important; /* Dark gray for readability on light backgrounds */
+        }
+
+        /* Target the grid containers specifically */
+        html.dark-mode .grid.grid-cols-2.gap-1 div,
+        html.dark-mode .space-y-1 div {
+            color: #1f2937 !important;
+        }
+
+        /* Fix header colors in theory sections */
+        html.dark-mode .text-blue-600 {
+            color: #3b82f6 !important; /* Keep blue but darker for visibility */
+        }
+        
+        html.dark-mode .text-purple-600 {
+            color: #8b5cf6 !important; /* Keep purple but darker for visibility */
+        }
+        
+        html.dark-mode .text-emerald-600 {
+            color: #10b981 !important; /* Keep emerald but darker for visibility */
+        }
+
+        /* Make sure the phase mapping and properties text is dark */
+        html.dark-mode div.text-xs.text-slate-600 {
+            color: #1f2937 !important;
+        }
+
+        /* Performance table row highlights */
+        html.dark-mode .bpsk-row {
+            background-color: rgba(239, 68, 68, 0.1) !important;
+        }
+
+        html.dark-mode .qpsk-row {
+            background-color: rgba(59, 130, 246, 0.1) !important;
+        }
+
+        html.dark-mode .psk8-row {
+            background-color: rgba(147, 51, 234, 0.1) !important;
+        }
+
+        /* Constellation diagram descriptions */
+        html.dark-mode .constellation-item {
+            background-color: #1e293b !important;
+            color: #cbd5e1 !important;
+        }
+
+        html.dark-mode .constellation-item h4 {
+            color: #f1f5f9 !important;
+        }
+
+        html.dark-mode .constellation-item p {
+            color: #94a3b8 !important;
+        }
+
+        /* Waveform control containers */
+        html.dark-mode .waveform-chart-container {
+            background-color: #1e293b !important;
+            border-color: #475569 !important;
+        }
+
+        html.dark-mode .control-group label {
+            color: #818cf8 !important;
+        }
+
+        /* Example info panel fixes */
+        html.dark-mode .example-info-panel {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%) !important;
+            color: #e2e8f0 !important;
+        }
+
+        html.dark-mode .example-info-panel h3,
+        html.dark-mode .example-info-panel h4 {
+            color: #f1f5f9 !important;
+        }
+
+        html.dark-mode .property-item {
+            background: rgba(99, 102, 241, 0.1) !important;
+            color: #cbd5e1 !important;
+        }
+
+        /* Main content sections */
+        html.dark-mode section {
+            background-color: #1e293b !important;
+            color: #e2e8f0 !important;
+        }
+
+        html.dark-mode section h2,
+        html.dark-mode section h3,
+        html.dark-mode section h4 {
+            color: #f1f5f9 !important;
+        }
+
+        html.dark-mode section p,
+        html.dark-mode section li {
+            color: #cbd5e1 !important;
+        }
+
+        /* Header navigation */
+        html.dark-mode header {
+            background-color: rgba(30, 41, 59, 0.9) !important;
+            backdrop-filter: blur(10px);
+        }
+
+        html.dark-mode header h1 {
+            color: #818cf8 !important;
+        }
+
+        html.dark-mode nav ul li a {
+            color: #cbd5e1 !important;
+        }
+
+        html.dark-mode nav ul li a:hover,
+        html.dark-mode nav ul li a.text-indigo-600 {
+            color: #818cf8 !important;
+        }
+
+        /* Mobile menu */
+        html.dark-mode #mobile-menu {
+            background-color: rgba(30, 41, 59, 0.95) !important;
+            border-top-color: #475569 !important;
+        }
+
+        /* Footer - Keep original colors, only change background */
+        html.dark-mode footer {
+            background-color: rgba(30, 41, 59, 0.9) !important;
+        }
+
+        /* Responsive input container fixes */
+        @media (max-width: 768px) {
+            .vector-inputs {
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 1rem !important;
+            }
+
+            .vector-input {
+                width: 100% !important;
+                justify-content: space-between !important;
+            }
+
+            .vector-input input {
+                flex-shrink: 0 !important;
+                width: 70px !important;
+            }
+        }
+    </style>
+</head>
+<body class="text-slate-800">
+
+    <!-- Header and Navigation -->
+    <header class="bg-white/80 backdrop-blur-lg shadow-sm sticky top-0 z-50">
+        <nav class="container mx-auto px-4 sm:px-6 py-4">
+            <div class="flex justify-between items-center">
+                <!-- Logo/Brand Section -->
+                <div class="flex items-center space-x-3 min-w-0">
+                    <h1 class="text-xl sm:text-2xl font-bold text-indigo-600 truncate">Digital Communication</h1>
+                    <span class="text-xs text-slate-500 hidden sm:block whitespace-nowrap">by Affan</span>
+                </div>
+
+                <!-- Desktop Navigation -->
+                <ul class="hidden lg:flex items-center space-x-4 xl:space-x-6 font-medium text-slate-600">
+                    <li><a href="../index.html" class="hover:text-indigo-600 transition-colors px-2 py-1">Home</a></li>
+                    <li><a href="../index.html#sampling" class="hover:text-indigo-600 transition-colors px-2 py-1">Sampling</a></li>
+                    <li><a href="../index.html#quantization" class="hover:text-indigo-600 transition-colors px-2 py-1">Quantization</a></li>
+                    <li><a href="../index.html#encoding" class="hover:text-indigo-600 transition-colors px-2 py-1">Encoding</a></li>
+                    <li><a href="../index.html#demo" class="hover:text-indigo-600 transition-colors px-2 py-1">Demo</a></li>
+                    <li><a href="index2.html" class="text-indigo-600 font-semibold px-2 py-1">Gram-Schmidt</a></li>
+                    <li><a href="../applications.html" class="hover:text-indigo-600 transition-colors px-2 py-1">Applications</a></li>
+                    <li><a href="../resources.html" class="hover:text-indigo-600 transition-colors px-2 py-1">Resources</a></li>
+                    <li>
+                        <button id="darkModeToggle" 
+                                class="bg-slate-800 text-white px-3 py-2 rounded-full shadow-lg hover:bg-slate-900 transition-all duration-300 flex items-center space-x-2" 
+                                aria-label="Toggle dark mode"
+                                title="Switch theme (Ctrl+D)">
+                            <span class="text-sm">🌙</span>
+                            <span class="hidden xl:inline text-xs font-medium">Dark</span>
+                        </button>
+                    </li>
+                </ul>
+
+                <!-- Mobile Menu Button -->
+                <button id="mobile-menu-button" class="lg:hidden focus:outline-none p-2 rounded-md hover:bg-slate-100 transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+                    </svg>
+                </button>
+            </div>
+        </nav>
+
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden lg:hidden border-t border-slate-200 bg-white/95 backdrop-blur-sm">
+            <div class="px-4 sm:px-6 py-4 space-y-1">
+                <a href="../index.html" class="block py-3 px-3 text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-md transition-colors">Home</a>
+                <a href="../index.html#sampling" class="block py-3 px-3 text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-md transition-colors">Sampling</a>
+                <a href="../index.html#quantization" class="block py-3 px-3 text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-md transition-colors">Quantization</a>
+                <a href="../index.html#encoding" class="block py-3 px-3 text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-md transition-colors">Encoding</a>
+                <a href="../index.html#demo" class="block py-3 px-3 text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-md transition-colors">Demo</a>
+                <a href="index2.html" class="block py-3 px-3 text-indigo-600 font-semibold bg-indigo-50 rounded-md">📚 Gram-Schmidt</a>
+                <a href="../applications.html" class="block py-3 px-3 text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-md transition-colors">Applications</a>
+                <a href="../resources.html" class="block py-3 px-3 text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-md transition-colors">Resources</a>
+                <div class="py-2">
+                    <button id="darkModeToggleMobile" 
+                            class="w-full bg-slate-800 text-white px-4 py-3 rounded-lg hover:bg-slate-900 transition-all duration-300 flex items-center justify-center space-x-3" 
+                            aria-label="Toggle dark mode">
+                        <span class="text-lg">🌙</span>
+                        <span class="font-medium">Toggle Dark Mode</span>
+                        <span class="text-xs opacity-75">(Ctrl+D)</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-6 py-12">
+        <!-- Page Header -->
+        <div class="text-center rounded-xl bg-white p-8 md:p-12 shadow-lg mb-12">
+            <h2 class="text-4xl font-bold text-indigo-600 mb-4">Gram-Schmidt Orthonormalization</h2>
+            <p class="text-lg text-slate-600 max-w-3xl mx-auto">
+                Master the mathematical foundation of digital communication systems. Transform linearly independent signals into orthonormal basis functions used in OFDM, MIMO, and signal space analysis.
+            </p>
+        </div>
+
+        <!-- Theory Section -->
+        <section class="bg-white p-8 rounded-xl shadow-lg mb-12">
+            <h2 class="text-3xl font-bold mb-6 text-center">Mathematical Foundation</h2>
+            <div class="grid md:grid-cols-2 gap-8">
+                <div>
+                    <h3 class="text-xl font-semibold mb-4 text-indigo-600">What is Gram-Schmidt?</h3>
+                    <p class="mb-4 text-slate-600">
+                        The Gram-Schmidt process is a fundamental algorithm in digital communication used to convert a set of 
+                        linearly independent signals into an orthonormal basis. This is crucial in signal space representation 
+                        and optimal receiver design.
+                    </p>
+                    
+                    <h3 class="text-xl font-semibold mb-4 text-indigo-600">Applications</h3>
+                    <ul class="space-y-2 text-slate-600">
+                        <li class="flex items-start">
+                            <span class="w-2 h-2 bg-indigo-500 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                            <span><strong>OFDM Systems:</strong> Creating orthogonal subcarriers for WiFi and LTE</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="w-2 h-2 bg-indigo-500 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                            <span><strong>MIMO Processing:</strong> Spatial signal separation and beamforming</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="w-2 h-2 bg-indigo-500 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                            <span><strong>Signal Space Analysis:</strong> Optimal receiver design</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="w-2 h-2 bg-indigo-500 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                            <span><strong>Compression:</strong> Transform coding and basis selection</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="bg-slate-50 p-6 rounded-lg">
+                    <h3 class="text-xl font-semibold mb-4 text-indigo-600">The Algorithm</h3>
+                    <div class="space-y-4 text-sm">
+                        <div class="bg-white p-4 rounded border-l-4 border-indigo-500">
+                            <p class="font-semibold text-slate-700 mb-2">Step 1: First basis function</p>
+                            <p class="text-slate-600 latex">φ₁(t) = s₁(t) / ||s₁(t)||</p>
+                        </div>
+                        <div class="bg-white p-4 rounded border-l-4 border-purple-500">
+                            <p class="font-semibold text-slate-700 mb-2">Step 2: Project and subtract</p>
+                            <p class="text-slate-600 latex">c<sub>ij</sub> = ⟨s<sub>i</sub>(t), φ<sub>j</sub>(t)⟩</p>
+                            <p class="text-slate-600 latex">g<sub>i</sub>(t) = s<sub>i</sub>(t) - Σ c<sub>ij</sub>φ<sub>j</sub>(t)</p>
+                        </div>
+                        <div class="bg-white p-4 rounded border-l-4 border-emerald-500">
+                            <p class="font-semibold text-slate-700 mb-2">Step 3: Normalize</p>
+                            <p class="text-slate-600 latex">φ<sub>i</sub>(t) = g<sub>i</sub>(t) / ||g<sub>i</sub>(t)||</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Interactive Visualization -->
+        <section class="bg-white p-8 rounded-xl shadow-lg mb-12">
+            <h2 class="text-3xl font-bold mb-6 text-center">Interactive Visualization</h2>
+            
+            <div class="grid lg:grid-cols-3 gap-8">
+                <!-- Input Controls -->
+                <div class="lg:col-span-1">
+                    <h3 class="text-xl font-semibold mb-4 text-indigo-600">Input Signals (2D Vectors)</h3>
+                    <p class="text-sm text-slate-600 mb-6">Enter your signal vectors below. Each represents a waveform in signal space.</p>
+                    
+                    <div class="space-y-4">
+                        <div class="bg-slate-50 p-4 rounded-lg">
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Signal 1 (s₁):</label>
+                            <div class="flex gap-2">
+                                <input type="number" id="s1x" value="3" step="0.1" class="flex-1 px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                                <input type="number" id="s1y" value="1" step="0.1" class="flex-1 px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                            </div>
+                        </div>
+                        
+                        <div class="bg-slate-50 p-4 rounded-lg">
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Signal 2 (s₂):</label>
+                            <div class="flex gap-2">
+                                <input type="number" id="s2x" value="2" step="0.1" class="flex-1 px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                                <input type="number" id="s2y" value="2" step="0.1" class="flex-1 px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                            </div>
+                        </div>
+                        
+                        <div class="bg-slate-50 p-4 rounded-lg">
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Signal 3 (s₃):</label>
+                            <div class="flex gap-2">
+                                <input type="number" id="s3x" value="1" step="0.1" class="flex-1 px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                                <input type="number" id="s3y" value="3" step="0.1" class="flex-1 px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                            </div>
+                        </div>
+                        
+                        <button id="computeBtn" class="w-full bg-indigo-600 text-white font-semibold px-6 py-3 rounded-md hover:bg-indigo-700 transition-colors">
+                            Compute Orthonormal Basis
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Visualization Canvas -->
+                <div class="lg:col-span-2">
+                    <h3 class="text-xl font-semibold mb-4 text-indigo-600">Signal Space Representation</h3>
+                    <div class="flex justify-center">
+                        <canvas id="signalCanvas" width="600" height="600" class="max-w-full h-auto"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Steps Output -->
+            <div class="mt-8">
+                <h3 class="text-xl font-semibold mb-4 text-indigo-600">Step-by-Step Computation</h3>
+                <div id="stepsOutput" class="space-y-4">
+                    <!-- Steps will be populated by JavaScript -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Real-World Examples -->
+        <section class="examples-section bg-white p-8 rounded-xl shadow-lg mb-12">
+            <h2 class="text-3xl font-bold mb-6 text-center">📡 Real-World Communication Systems</h2>
+            <p class="text-lg text-slate-600 text-center max-w-3xl mx-auto mb-8">
+                Explore authentic implementations from industry standards including LTE, WiFi, GPS, and satellite communications. 
+                Each example uses actual signal parameters and mathematical formulations from deployed systems.
+            </p>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                <!-- ...existing code for example buttons... -->
+                <button class="example-btn bg-gradient-to-br from-blue-50 to-indigo-50 hover:from-blue-100 hover:to-indigo-100 border border-blue-200 p-4 rounded-lg text-left transition-all" data-example="1">
+                    <div class="font-semibold text-blue-600 mb-1">BPSK</div>
+                    <div class="text-sm text-slate-600 mb-1">Deep Space & Control</div>
+                    <div class="text-xs text-slate-500">NASA, Satellite Links</div>
+                </button>
+
+                <button class="example-btn bg-gradient-to-br from-purple-50 to-pink-50 hover:from-purple-100 hover:to-pink-100 border border-purple-200 p-4 rounded-lg text-left transition-all" data-example="2">
+                    <div class="font-semibold text-purple-600 mb-1">QPSK</div>
+                    <div class="text-sm text-slate-600 mb-1">LTE/4G, DVB-S2, GPS</div>
+                    <div class="text-xs text-slate-500">2 bits/symbol, Gray coded</div>
+                </button>
+
+                <button class="example-btn bg-gradient-to-br from-emerald-50 to-teal-50 hover:from-emerald-100 hover:to-teal-100 border border-emerald-200 p-4 rounded-lg text-left transition-all" data-example="3">
+                    <div class="font-semibold text-emerald-600 mb-1">16-QAM</div>
+                    <div class="text-sm text-slate-600 mb-1">LTE-A, Cable Modems</div>
+                    <div class="text-xs text-slate-500">4 bits/symbol, adaptive</div>
+                </button>
+
+                <button class="example-btn bg-gradient-to-br from-orange-50 to-red-50 hover:from-orange-100 hover:to-red-100 border border-orange-200 p-4 rounded-lg text-left transition-all" data-example="4">
+                    <div class="font-semibold text-orange-600 mb-1">OFDM</div>
+                    <div class="text-sm text-slate-600 mb-1">WiFi 6, LTE, 5G NR</div>
+                    <div class="text-xs text-slate-500">Orthogonal frequencies</div>
+                </button>
+
+                <button class="example-btn bg-gradient-to-br from-cyan-50 to-blue-50 hover:from-cyan-100 hover:to-blue-100 border border-cyan-200 p-4 rounded-lg text-left transition-all" data-example="5">
+                    <div class="font-semibold text-cyan-600 mb-1">Walsh-Hadamard</div>
+                    <div class="text-sm text-slate-600 mb-1">CDMA, GPS Codes</div>
+                    <div class="text-xs text-slate-500">IS-95, Spreading</div>
+                </button>
+
+                <button class="example-btn bg-gradient-to-br from-violet-50 to-purple-50 hover:from-violet-100 hover:to-purple-100 border border-violet-200 p-4 rounded-lg text-left transition-all" data-example="6">
+                    <div class="font-semibold text-violet-600 mb-1">RRC Pulse</div>
+                    <div class="text-sm text-slate-600 mb-1">GSM, LTE, Satellite</div>
+                    <div class="text-xs text-slate-500">ISI-free transmission</div>
+                </button>
+
+                <button class="example-btn bg-gradient-to-br from-pink-50 to-rose-50 hover:from-pink-100 hover:to-rose-100 border border-pink-200 p-4 rounded-lg text-left transition-all" data-example="7">
+                    <div class="font-semibold text-pink-600 mb-1">MIMO Spatial</div>
+                    <div class="text-sm text-slate-600 mb-1">WiFi 6, 5G Massive</div>
+                    <div class="text-xs text-slate-500">Alamouti, Beamforming</div>
+                </button>
+
+                <button class="example-btn bg-gradient-to-br from-amber-50 to-yellow-50 hover:from-amber-100 hover:to-yellow-100 border border-amber-200 p-4 rounded-lg text-left transition-all" data-example="8">
+                    <div class="font-semibold text-amber-600 mb-1">Spread Spectrum</div>
+                    <div class="text-sm text-slate-600 mb-1">Military, GPS, Anti-jam</div>
+                    <div class="text-xs text-slate-500">DSSS, PN sequences</div>
+                </button>
+            </div>
+        </section>
+
+        <!-- PSK Waveforms Section -->
+        <section class="bg-white p-8 rounded-xl shadow-lg mb-12">
+            <h2 class="text-3xl font-bold mb-6 text-center">📊 Phase Shift Keying (PSK) Analysis</h2>
+            <p class="text-lg text-slate-600 text-center max-w-3xl mx-auto mb-8">
+                Examine mathematically accurate PSK waveforms and their orthogonal basis representations.
+            </p>
+
+            <!-- BPSK Waveform -->
+            <div class="mb-12">
+                <h3 class="text-xl font-semibold mb-4 text-indigo-600">🔄 Binary Phase Shift Keying (BPSK)</h3>
+                <div class="grid lg:grid-cols-3 gap-8">
+                    <div class="lg:col-span-2">
+                        <canvas id="bpskCanvas" width="800" height="300" class="w-full h-auto"></canvas>
+                    </div>
+                    <div>
+                        <div class="bg-slate-50 p-4 rounded-lg space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Bit Sequence:</label>
+                                <input type="text" id="bpskBits" value="110100" maxlength="8" class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Carrier Frequency: <span id="bpskFreqLabel">3 Hz</span></label>
+                                <input type="range" id="bpskFreq" min="1" max="5" value="3" class="w-full">
+                            </div>
+                            <button id="updateBpsk" class="w-full bg-indigo-600 text-white font-semibold px-4 py-2 rounded-md hover:bg-indigo-700 transition-colors">Update BPSK</button>
+                        </div>
+                        <div class="mt-4 p-4 bg-blue-50 rounded-lg">
+                            <h4 class="font-semibold text-blue-600 mb-2">Mathematical Form</h4>
+                            <div class="text-sm text-slate-600 space-y-1">
+                                <div class="latex">s₁(t) = A cos(2πfct + 0°) for '1'</div>
+                                <div class="latex">s₀(t) = A cos(2πfct + 180°) for '0'</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- QPSK Waveform -->
+            <div class="mb-12">
+                <h3 class="text-xl font-semibold mb-4 text-indigo-600">🔄 Quadrature Phase Shift Keying (QPSK)</h3>
+                <div class="grid lg:grid-cols-3 gap-8">
+                    <div class="lg:col-span-2">
+                        <canvas id="qpskCanvas" width="800" height="400" class="w-full h-auto"></canvas>
+                    </div>
+                    <div>
+                        <div class="bg-slate-50 p-4 rounded-lg space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Bit Sequence:</label>
+                                <input type="text" id="qpskBits" value="11010011" maxlength="8" class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Carrier Frequency: <span id="qpskFreqLabel">2 Hz</span></label>
+                                <input type="range" id="qpskFreq" min="1" max="5" value="2" class="w-full">
+                            </div>
+                            <button id="updateQpsk" class="w-full bg-purple-600 text-white font-semibold px-4 py-2 rounded-md hover:bg-purple-700 transition-colors">Update QPSK</button>
+                        </div>
+                        <div class="mt-4 p-4 bg-purple-50 rounded-lg">
+                            <h4 class="font-semibold text-purple-600 mb-2">Phase Mapping</h4>
+                            <div class="text-xs text-slate-600 grid grid-cols-2 gap-1">
+                                <div>00 → 45°</div>
+                                <div>01 → 135°</div>
+                                <div>11 → 225°</div>
+                                <div>10 → 315°</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 8-PSK Waveform -->
+            <div class="mb-12">
+                <h3 class="text-xl font-semibold mb-4 text-indigo-600">🔄 8-Phase Shift Keying (8-PSK)</h3>
+                <div class="grid lg:grid-cols-3 gap-8">
+                    <div class="lg:col-span-2">
+                        <canvas id="psk8Canvas" width="800" height="400" class="w-full h-auto"></canvas>
+                    </div>
+                    <div>
+                        <div class="bg-slate-50 p-4 rounded-lg space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Bit Sequence:</label>
+                                <input type="text" id="psk8Bits" value="110100" maxlength="6" class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Carrier Frequency: <span id="psk8FreqLabel">2 Hz</span></label>
+                                <input type="range" id="psk8Freq" min="1" max="5" value="2" class="w-full">
+                            </div>
+                            <button id="updatePsk8" class="w-full bg-emerald-600 text-white font-semibold px-4 py-2 rounded-md hover:bg-emerald-700 transition-colors">Update 8-PSK</button>
+                        </div>
+                        <div class="mt-4 p-4 bg-emerald-50 rounded-lg">
+                            <h4 class="font-semibold text-emerald-600 mb-2">Properties</h4>
+                            <div class="text-xs text-slate-600 space-y-1">
+                                <div>3 bits per symbol</div>
+                                <div>8 phase states</div>
+                                <div>Higher spectral efficiency</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Constellation Diagrams -->
+            <div class="mb-8">
+                <h3 class="text-xl font-semibold mb-6 text-center text-indigo-600">⭐ Constellation Diagrams</h3>
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="text-center">
+                        <canvas id="bpskConstellation" width="200" height="200" class="mx-auto"></canvas>
+                        <h4 class="font-semibold text-blue-600 mt-2">BPSK</h4>
+                        <p class="text-sm text-slate-600">2 points, Maximum separation</p>
+                    </div>
+                    <div class="text-center">
+                        <canvas id="qpskConstellation" width="200" height="200" class="mx-auto"></canvas>
+                        <h4 class="font-semibold text-purple-600 mt-2">QPSK</h4>
+                        <p class="text-sm text-slate-600">4 points, Gray coded</p>
+                    </div>
+                    <div class="text-center">
+                        <canvas id="psk8Constellation" width="200" height="200" class="mx-auto"></canvas>
+                        <h4 class="font-semibold text-emerald-600 mt-2">8-PSK</h4>
+                        <p class="text-sm text-slate-600">8 points, Higher density</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Performance Table -->
+            <div class="comparison-table">
+                <h3 class="text-xl font-semibold mb-4 text-center text-indigo-600">📈 Performance Comparison</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="bg-slate-50">
+                                <th class="px-4 py-3 text-left">Modulation</th>
+                                <th class="px-4 py-3 text-left">Bits/Symbol</th>
+                                <th class="px-4 py-3 text-left">Phase Levels</th>
+                                <th class="px-4 py-3 text-left">Eb/N0 (BER=10⁻⁶)</th>
+                                <th class="px-4 py-3 text-left">Spectral Efficiency</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white">
+                            <tr class="border-t">
+                                <td class="px-4 py-3 font-semibold text-blue-600">BPSK</td>
+                                <td class="px-4 py-3">1</td>
+                                <td class="px-4 py-3">2</td>
+                                <td class="px-4 py-3">10.5 dB</td>
+                                <td class="px-4 py-3">1 bit/s/Hz</td>
+                            </tr>
+                            <tr class="border-t">
+                                <td class="px-4 py-3 font-semibold text-purple-600">QPSK</td>
+                                <td class="px-4 py-3">2</td>
+                                <td class="px-4 py-3">4</td>
+                                <td class="px-4 py-3">10.5 dB</td>
+                                <td class="px-4 py-3">2 bits/s/Hz</td>
+                            </tr>
+                            <tr class="border-t">
+                                <td class="px-4 py-3 font-semibold text-emerald-600">8-PSK</td>
+                                <td class="px-4 py-3">3</td>
+                                <td class="px-4 py-3">8</td>
+                                <td class="px-4 py-3">14.7 dB</td>
+                                <td class="px-4 py-3">3 bits/s/Hz</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-slate-100 py-12">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-8">
+                <h3 class="text-xl font-bold text-slate-800 mb-4">Connect with the Creator</h3>
+                <div class="flex justify-center space-x-4 flex-wrap gap-2">
+                    <!-- ...existing social media links from main site... -->
+                    <a href="https://www.linkedin.com/in/affan-danish-08a144353/" target="_blank" 
+                    class="group bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl transition-all duration-300 flex items-center space-x-3 transform hover:scale-105 shadow-lg hover:shadow-xl">
+                        <svg class="w-5 h-5 group-hover:rotate-12 transition-transform" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                        </svg>
+                        <div class="text-left">
+                            <div class="font-semibold">LinkedIn</div>
+                            <div class="text-xs opacity-80">Professional Network</div>
+                        </div>
+                    </a>
+
+                    <a href="mailto:Affan2304788@st.jmi.ac.in" 
+                    class="group bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-xl transition-all duration-300 flex items-center space-x-3 transform hover:scale-105 shadow-lg hover:shadow-xl">
+                        <svg class="w-5 h-5 group-hover:bounce" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-.904.732-1.636 1.636-1.636h.917l9.447 7.096 9.447-7.096h.917A1.636 1.636 0 0 1 24 5.457z"/>
+                        </svg>
+                        <div class="text-left">
+                            <div class="font-semibold">Email</div>
+                            <div class="text-xs opacity-80">Direct Contact</div>
+                        </div>
+                    </a>
+
+                    <a href="https://x.com/AffanMhz" target="_blank" 
+                    class="group bg-sky-500 hover:bg-sky-600 text-white px-6 py-3 rounded-xl transition-all duration-300 flex items-center space-x-3 transform hover:scale-105 shadow-lg hover:shadow-xl">
+                        <svg class="w-5 h-5 group-hover:rotate-12 transition-transform" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
+                        </svg>
+                        <div class="text-left">
+                            <div class="font-semibold">Twitter/X</div>
+                            <div class="text-xs opacity-80">Latest Updates</div>
+                        </div>
+                    </a>
+
+                    <a href="https://forms.gle/Yiuq2CYsoSZvgQ1RA" target="_blank" 
+                    class="group bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-xl transition-all duration-300 flex items-center space-x-3 transform hover:scale-105 shadow-lg hover:shadow-xl">
+                        <svg class="w-5 h-5 group-hover:pulse" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                        </svg>
+                        <div class="text-left">
+                            <div class="font-semibold">Feedback</div>
+                            <div class="text-xs opacity-80">Share Your Thoughts</div>
+                        </div>
+                    </a>
+                </div>
+                <div class="mt-6">
+                    <p class="text-slate-600 italic">"Per aspera ad astra" - Through adversity to the stars ⭐</p>
+                </div>
+            </div>
+            <div class="border-t border-slate-300 pt-8 text-center">
+                <p class="text-slate-600 mb-2">Interactive Gram-Schmidt Learning Tool - Digital Communication 101</p>
+                <p class="text-slate-800 font-semibold">Created with ❤️ by <a href="https://www.linkedin.com/in/affan-danish-08a144353/" target="_blank" class="text-indigo-600 hover:text-indigo-800 transition-colors">Affan Danish</a></p>
+                <p class="text-xs text-slate-500 mt-2">© 2025 Affan Danish. All Rights Reserved.</p>
+                <p class="text-xs text-slate-400 mt-1">JMI | Electronics & Communication Engineering</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+
+    <script>
+        // Mobile Menu Toggle (consistent with main site)
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        
+        mobileMenuButton?.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+    </script>
+</body>
+</html>
