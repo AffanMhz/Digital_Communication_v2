@@ -82,12 +82,15 @@
 
         /* SVG icons - fix MIT OpenCourseWare and other icons */
         html.dark-mode svg {
-            color: inherit !important;
+        /* Fix for SVGs with inner symbols in dark mode */
+        html.dark-mode svg text,
+        html.dark-mode svg use,
+        html.dark-mode svg .icon-text,
+        html.dark-mode svg .symbol {
+          fill: white !important;
+          color: white !important;
         }
 
-        html.dark-mode .text-red-600 svg {
-            color: #f87171 !important;
-        }
 
         html.dark-mode .text-indigo-600 svg,
         html.dark-mode .text-indigo-600 {
