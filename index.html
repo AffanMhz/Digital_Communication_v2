@@ -44,7 +44,8 @@
             (function() {
                 try {
                     var saved = localStorage.getItem('dark-mode');
-                    var shouldDark = saved === 'true' || (saved === null && window.matchMedia('(prefers-color-scheme: dark)').matches);
+                    // Default to LIGHT on first load: only enable dark if explicitly saved
+                    var shouldDark = (saved === 'true');
                     if (shouldDark) {
                         document.documentElement.classList.add('dark-mode');
                         // Also add to body so CSS selectors using body.dark-mode take effect

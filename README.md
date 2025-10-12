@@ -10,7 +10,10 @@
 [![D3.js](https://img.shields.io/badge/D3.js-F9A03C?logo=d3.js&logoColor=white)](https://d3js.org/)
 [![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?logo=javascript&logoColor=black)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
 
-[🚀 Live Demo](#-getting-started) • [📚 Features](#-features) • [🎓 Learning Path](#-learning-path) • [🛠️ Setup](#-installation--setup)
+### 🚀 [**Click Here to Try the Live Demo**](https://affanmhz.github.io/Digital_Communication_v2/)
+
+
+[🚀 Live Demo](https://affanmhz.github.io/Digital_Communication_v2/) • [📚 Features](https://affanmhz.github.io/Digital_Communication_v2/resources.html) • [🎓 Learning Path](#-learning-path) • [🛠️ Setup](#-installation--setup)
 
 </div>
 

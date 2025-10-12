@@ -191,11 +191,20 @@
     <script>
         (function() {
             try {
-                var saved = localStorage.getItem('dark-mode');
-                var shouldDark = saved === 'true' || (saved === null && window.matchMedia('(prefers-color-scheme: dark)').matches);
+                // Unified preference: prefer 'theme-preference' ('dark'|'light'), then legacy 'dark-mode', then system
+                var pref = localStorage.getItem('theme-preference');
+                var legacy = localStorage.getItem('dark-mode');
+                var shouldDark;
+                if (pref === 'dark') shouldDark = true;
+                else if (pref === 'light') shouldDark = false;
+                else if (legacy === 'true') shouldDark = true;
+                else if (legacy === 'false') shouldDark = false;
+                // Default to LIGHT on first load: only enable dark if explicitly saved
+                else shouldDark = false;
+
+                var html = document.documentElement;
                 if (shouldDark) {
-                    document.documentElement.classList.add('dark-mode');
-                    // Also tag body so global dark background pattern applies fully
+                    html.classList.add('dark-mode');
                     if (document.body) {
                         document.body.classList.add('dark-mode');
                     } else {
@@ -205,6 +214,18 @@
                     }
                     var meta = document.querySelector('meta[name="theme-color"]');
                     if (meta) meta.setAttribute('content', '#0f172a');
+                } else {
+                    // Ensure no stale classes if switching back
+                    html.classList.remove('dark-mode');
+                    if (document.body) {
+                        document.body.classList.remove('dark-mode');
+                    } else {
+                        document.addEventListener('DOMContentLoaded', function() {
+                            document.body.classList.remove('dark-mode');
+                        });
+                    }
+                    var meta2 = document.querySelector('meta[name="theme-color"]');
+                    if (meta2) meta2.setAttribute('content', '#dfdff3');
                 }
             } catch (e) {}
         })();
