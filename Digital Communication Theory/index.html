@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Communication Theory - By Affan Danish</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    
+    <!-- External CSS -->
+    <link rel="stylesheet" href="../styles.css">
+    
+    <!-- Favicon links -->
+    <link rel="shortcut icon" href="../favicon.ico" type="image/x-icon">
+    <link rel="icon" type="image/png" sizes="32x32" href="../favicon.png?v=2">
+    <link rel="icon" type="image/png" sizes="16x16" href="../favicon.png?v=2">
+    <link rel="icon" type="image/svg+xml" href="../favicon.png?v=2">
+    <link rel="apple-touch-icon" href="../favicon.png?v=2">
+    <link rel="icon" sizes="192x192" href="../favicon.png?v=2">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Add these performance optimizations -->
+    <meta name="description" content="Advanced Digital Communication Theory - Binary and M-ary signals, PCM, Line codes, ISI, and Baseband Signal Transmission">
+    <meta name="keywords" content="digital communication, binary signals, M-ary signals, PCM, line codes, ISI, baseband transmission">
+    <meta name="author" content="Affan Danish">
+    <meta name="color-scheme" content="light dark">
+    <meta name="theme-color" content="#dfdff3">
+    
+    <!-- Preload critical resources -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" as="style">
+    <link rel="preload" href="https://d3js.org/d3.v7.min.js" as="script">
+    
+    <!-- Apply dark mode class ASAP before paint to avoid flashes/overscroll white -->
+    <script>
+        (function() {
+            try {
+                var saved = localStorage.getItem('dark-mode');
+                // Default to LIGHT on first load: only enable dark if explicitly saved
+                var shouldDark = (saved === 'true');
+                if (shouldDark) {
+                    document.documentElement.classList.add('dark-mode');
+                    // Also add to body so CSS selectors using body.dark-mode take effect
+                    if (document.body) {
+                        document.body.classList.add('dark-mode');
+                    } else {
+                        // If body isn't available yet, add after DOMContentLoaded
+                        document.addEventListener('DOMContentLoaded', function() {
+                            document.body.classList.add('dark-mode');
+                        });
+                    }
+                    // Hint to UA for native UI colors
+                    document.documentElement.style.colorScheme = 'dark';
+                    var meta = document.querySelector('meta[name="theme-color"]');
+                    if (meta) meta.setAttribute('content', '#0f172a');
+                }
+            } catch (e) {}
+        })();
+    </script>
+</head>
+<body class="text-slate-800">
+
+    <!-- Header and Navigation -->
+    <header class="bg-white/80 backdrop-blur-lg shadow-sm sticky top-0 z-50">
+        <nav class="container mx-auto px-4 sm:px-6 py-4">
+            <div class="flex justify-between items-center">
+                <!-- Logo/Brand Section -->
+                <div class="flex items-center space-x-3 min-w-0">
+                    <h1 class="text-xl sm:text-2xl font-bold text-indigo-600 truncate">Digital Communication Theory</h1>
+                    <span class="text-xs text-slate-500 hidden sm:block whitespace-nowrap">by Affan</span>
+                </div>
+
+                <!-- Desktop Navigation -->
+                <ul class="hidden lg:flex items-center space-x-4 xl:space-x-6 font-medium text-slate-600">
+                    <li><a href="#home" class="hover:text-indigo-600 transition-colors nav-link px-2 py-1">Home</a></li>
+                    <li><a href="#binary-mary" class="hover:text-indigo-600 transition-colors nav-link px-2 py-1">Signals</a></li>
+                    <li><a href="#pcm-line-codes" class="hover:text-indigo-600 transition-colors nav-link px-2 py-1">PCM & Line Codes</a></li>
+                    <li><a href="#geometric" class="hover:text-indigo-600 transition-colors nav-link px-2 py-1">Geometric Rep.</a></li>
+                    <li><a href="#orthogonal" class="hover:text-indigo-600 transition-colors nav-link px-2 py-1">Orthogonal</a></li>
+                    <li><a href="#baseband" class="hover:text-indigo-600 transition-colors nav-link px-2 py-1">Baseband</a></li>
+                    
+                    <!-- Dark Mode Toggle -->
+                    <li>
+                        <button id="darkModeToggle" 
+                                class="bg-slate-800 text-white px-3 py-2 rounded-full shadow-lg hover:bg-slate-900 transition-all duration-300 flex items-center space-x-2" 
+                                aria-label="Toggle dark mode"
+                                title="Switch to Dark Mode (Ctrl+D)">
+                            <span class="text-sm">🌙</span>
+                            <span class="hidden xl:inline text-xs font-medium">Dark</span>
+                        </button>
+                    </li>
+                    
+                    <!-- More Dropdown -->
+                    <li class="relative group">
+                        <button class="hover:text-indigo-600 transition-colors flex items-center px-2 py-1">
+                            More 
+                            <svg class="w-4 h-4 ml-1 transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </button>
+                        <div class="absolute right-0 mt-2 w-56 bg-white rounded-md shadow-lg border opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform translate-y-1 group-hover:translate-y-0">
+                            <a href="../index.html" class="flex items-center px-4 py-3 text-sm text-slate-700 hover:bg-slate-50 transition-colors">
+                                <svg class="w-4 h-4 mr-3 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                                </svg>
+                                <div>
+                                    <div class="font-medium">Main Page</div>
+                                    <div class="text-xs text-slate-500">Back to home</div>
+                                </div>
+                            </a>
+                            <a href="../resources.html" class="flex items-center px-4 py-3 text-sm text-slate-700 hover:bg-slate-50 transition-colors">
+                                <svg class="w-4 h-4 mr-3 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C20.168 18.477 18.582 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                                </svg>
+                                <div>
+                                    <div class="font-medium">Resources & Lectures</div>
+                                    <div class="text-xs text-slate-500">Academic materials</div>
+                                </div>
+                            </a>
+                            <a href="../applications.html" class="flex items-center px-4 py-3 text-sm text-slate-700 hover:bg-slate-50 transition-colors">
+                                <svg class="w-4 h-4 mr-3 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9-9a9 9 0 00-9 9m0 0a9 9 0 919-9"></path>
+                                </svg>
+                                <div>
+                                    <div class="font-medium">Real-World Applications</div>
+                                    <div class="text-xs text-slate-500">Industry examples</div>
+                                </div>
+                            </a>
+                        </div>
+                    </li>
+                </ul>
+
+                <!-- Mobile Menu Button -->
+                <button id="mobile-menu-button" class="lg:hidden focus:outline-none p-2 rounded-md hover:bg-slate-100 transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+                    </svg>
+                </button>
+            </div>
+        </nav>
+
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden lg:hidden border-t border-slate-200 bg-white/95 backdrop-blur-sm">
+            <div class="px-4 sm:px-6 py-4 space-y-1">
+                <a href="#home" class="block py-3 px-3 text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-md transition-colors nav-link">Home</a>
+                <a href="#binary-mary" class="block py-3 px-3 text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-md transition-colors nav-link">Signals</a>
+                <a href="#pcm-line-codes" class="block py-3 px-3 text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-md transition-colors nav-link">PCM & Line Codes</a>
+                <a href="#geometric" class="block py-3 px-3 text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-md transition-colors nav-link">Geometric Rep.</a>
+                <a href="#orthogonal" class="block py-3 px-3 text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-md transition-colors nav-link">Orthogonal</a>
+                <a href="#baseband" class="block py-3 px-3 text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-md transition-colors nav-link">Baseband</a>
+                
+                <!-- Dark Mode Toggle - Mobile -->
+                <div class="py-3 px-3">
+                    <button id="darkModeToggleMobile" 
+                            class="w-full bg-slate-800 text-white px-4 py-3 rounded-lg hover:bg-slate-900 transition-all duration-300 flex items-center justify-center space-x-3" 
+                            aria-label="Toggle dark mode">
+                        <span class="text-lg">🌙</span>
+                        <span class="font-medium">Toggle Dark Mode</span>
+                        <span class="text-xs opacity-75">(Ctrl+D)</span>
+                    </button>
+                </div>
+                
+                <!-- Mobile Resources Section -->
+                <div class="border-t border-slate-200 pt-4 mt-4">
+                    <a href="../index.html" class="flex items-center py-3 px-3 text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-md transition-colors">
+                        <svg class="w-4 h-4 mr-3 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                        </svg>
+                        Main Page
+                    </a>
+                    <a href="../resources.html" class="flex items-center py-3 px-3 text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-md transition-colors">
+                        <svg class="w-4 h-4 mr-3 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C20.168 18.477 18.582 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                        </svg>
+                        Resources
+                    </a>
+                    <a href="../applications.html" class="flex items-center py-3 px-3 text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-md transition-colors">
+                        <svg class="w-4 h-4 mr-3 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9-9a9 9 0 00-9 9m0 0a9 9 0 919-9"></path>
+                        </svg>
+                        Applications
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-6 py-12">
+        <!-- Home Section -->
+        <section id="home">
+            <div class="text-center rounded-xl bg-white p-8 md:p-12 shadow-lg">
+                <h2 class="text-4xl font-bold text-indigo-600 mb-4">Digital Communication Theory</h2>
+                <p class="text-lg text-slate-600 max-w-3xl mx-auto">
+                    Dive deeper into the fundamental concepts of digital communication systems. Explore signal representations, modulation techniques, and channel effects that form the backbone of modern communication technologies.
+                </p>
+            </div>
+        </section>
+
+        <!-- Binary and M-ary Signals Section -->
+        <section id="binary-mary">
+            <div class="bg-white p-8 rounded-xl shadow-lg">
+                <h2 class="text-3xl font-bold mb-6 text-center">Binary and M-ary Signals</h2>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div>
+                        <h3 class="text-xl font-semibold mb-2">Binary Signals</h3>
+                        <p class="mb-4 text-slate-600">Binary signals use two distinct symbols to represent digital information, typically 0 and 1. These are the fundamental building blocks of digital communication systems.</p>
+                        
+                        <h4 class="text-lg font-semibold mb-2">Types of Binary Signals:</h4>
+                        <ul class="list-disc list-inside text-slate-600 space-y-1 mb-4">
+                            <li><strong>Unipolar:</strong> Uses 0 and +V volts</li>
+                            <li><strong>Polar:</strong> Uses -V and +V volts</li>
+                            <li><strong>Bipolar:</strong> Uses -V, 0, and +V volts (AMI encoding)</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-semibold mb-2">M-ary Signals</h3>
+                        <p class="mb-4 text-slate-600">M-ary signaling uses M > 2 distinct symbols to transmit multiple bits per symbol, increasing spectral efficiency.</p>
+                        
+                        <h4 class="text-lg font-semibold mb-2">Key Concepts:</h4>
+                        <ul class="list-disc list-inside text-slate-600 space-y-1">
+                            <li><strong>Symbol Rate:</strong> R<sub>s</sub> = R<sub>b</sub>/log₂(M)</li>
+                            <li><strong>Bits per Symbol:</strong> log₂(M)</li>
+                            <li><strong>Examples:</strong> 4-PAM, 8-PSK, 16-QAM</li>
+                            <li><strong>Advantage:</strong> Higher data rate in limited bandwidth</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PCM and Line Codes Section -->
+        <section id="pcm-line-codes">
+            <div class="bg-white p-8 rounded-xl shadow-lg">
+                <h2 class="text-3xl font-bold mb-6 text-center">PCM Formats & Line Codes</h2>
+                
+                <div class="mb-8">
+                    <h3 class="text-2xl font-semibold mb-4">Pulse Code Modulation (PCM)</h3>
+                    <p class="text-slate-600 mb-4">PCM is a method used to digitally represent sampled analog signals. It's the standard form of digital audio in computers, CDs, and digital telephony.</p>
+                    
+                    <div class="grid md:grid-cols-3 gap-4">
+                        <div class="p-4 bg-slate-50 rounded-lg">
+                            <h4 class="font-bold text-indigo-600 mb-2">1. Sampling</h4>
+                            <p class="text-sm text-slate-600">Convert continuous signal to discrete-time samples at Nyquist rate</p>
+                        </div>
+                        <div class="p-4 bg-slate-50 rounded-lg">
+                            <h4 class="font-bold text-purple-600 mb-2">2. Quantization</h4>
+                            <p class="text-sm text-slate-600">Map samples to finite set of amplitude levels</p>
+                        </div>
+                        <div class="p-4 bg-slate-50 rounded-lg">
+                            <h4 class="font-bold text-emerald-600 mb-2">3. Encoding</h4>
+                            <p class="text-sm text-slate-600">Represent quantized values as binary codewords</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="text-2xl font-semibold mb-4">Line Codes</h3>
+                    <p class="text-slate-600 mb-4">Line codes are techniques for representing digital data as a sequence of voltage or current pulses for transmission over a physical medium.</p>
+                    
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full border-collapse border border-slate-300">
+                            <thead>
+                                <tr class="bg-slate-100">
+                                    <th class="border border-slate-300 px-4 py-2 text-left">Line Code</th>
+                                    <th class="border border-slate-300 px-4 py-2 text-left">Description</th>
+                                    <th class="border border-slate-300 px-4 py-2 text-left">Advantages</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-slate-600">
+                                <tr>
+                                    <td class="border border-slate-300 px-4 py-2 font-semibold">NRZ (Non-Return to Zero)</td>
+                                    <td class="border border-slate-300 px-4 py-2">Signal doesn't return to zero between bits</td>
+                                    <td class="border border-slate-300 px-4 py-2">Simple, efficient bandwidth usage</td>
+                                </tr>
+                                <tr class="bg-slate-50">
+                                    <td class="border border-slate-300 px-4 py-2 font-semibold">RZ (Return to Zero)</td>
+                                    <td class="border border-slate-300 px-4 py-2">Signal returns to zero in middle of bit period</td>
+                                    <td class="border border-slate-300 px-4 py-2">Self-clocking, easy synchronization</td>
+                                </tr>
+                                <tr>
+                                    <td class="border border-slate-300 px-4 py-2 font-semibold">Manchester</td>
+                                    <td class="border border-slate-300 px-4 py-2">Transition in middle of each bit period</td>
+                                    <td class="border border-slate-300 px-4 py-2">No DC component, self-clocking</td>
+                                </tr>
+                                <tr class="bg-slate-50">
+                                    <td class="border border-slate-300 px-4 py-2 font-semibold">AMI (Alternate Mark Inversion)</td>
+                                    <td class="border border-slate-300 px-4 py-2">Binary 1s alternate in polarity</td>
+                                    <td class="border border-slate-300 px-4 py-2">No DC, error detection</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="mt-8">
+                    <h3 class="text-2xl font-semibold mb-4">Power Spectral Density (PSD) of Line Codes</h3>
+                    <p class="text-slate-600 mb-4">The Power Spectral Density describes how the power of a signal is distributed over frequency. Different line codes have different PSD characteristics:</p>
+                    
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="p-4 bg-slate-50 rounded-lg">
+                            <h4 class="font-bold mb-2">NRZ PSD</h4>
+                            <p class="text-sm text-slate-600 mb-2">Has significant DC component and main lobe bandwidth of R<sub>b</sub></p>
+                            <div class="bg-slate-100 p-3 rounded text-center">
+                                <span class="text-xs font-mono">P(f) = T<sub>b</sub> sinc²(πfT<sub>b</sub>)</span>
+                            </div>
+                        </div>
+                        <div class="p-4 bg-slate-50 rounded-lg">
+                            <h4 class="font-bold mb-2">Manchester PSD</h4>
+                            <p class="text-sm text-slate-600 mb-2">No DC component, main lobe bandwidth of 2R<sub>b</sub></p>
+                            <div class="bg-slate-100 p-3 rounded text-center">
+                                <span class="text-xs font-mono">P(f) = T<sub>b</sub> sin²(πfT<sub>b</sub>/2) / (πfT<sub>b</sub>/2)²</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Geometric Representation Section -->
+        <section id="geometric">
+            <div class="bg-white p-8 rounded-xl shadow-lg">
+                <h2 class="text-3xl font-bold mb-6 text-center">Geometric Representation of Signals</h2>
+                
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div>
+                        <h3 class="text-xl font-semibold mb-4">Signal Space Representation</h3>
+                        <p class="text-slate-600 mb-4">Any set of M finite-energy signals {s<sub>i</sub>(t)} can be represented as linear combinations of N ≤ M orthonormal basis functions {φ<sub>j</sub>(t)}.</p>
+                        
+                        <div class="bg-slate-100 p-4 rounded-lg mb-4">
+                            <p class="font-semibold mb-2">Signal Representation:</p>
+                            <p class="font-mono text-sm">s<sub>i</sub>(t) = Σ<sub>j=1</sub><sup>N</sup> s<sub>ij</sub> φ<sub>j</sub>(t)</p>
+                            <p class="text-xs text-slate-600 mt-2">where s<sub>ij</sub> are the signal coefficients</p>
+                        </div>
+
+                        <h4 class="font-semibold mb-2">Key Properties:</h4>
+                        <ul class="list-disc list-inside text-slate-600 space-y-1">
+                            <li><strong>Energy:</strong> E<sub>i</sub> = Σ s<sub>ij</sub>²</li>
+                            <li><strong>Distance:</strong> d<sub>ij</sub> = ||s<sub>i</sub> - s<sub>j</sub>||</li>
+                            <li><strong>Inner Product:</strong> ⟨s<sub>i</sub>, s<sub>j</sub>⟩ = Σ s<sub>ik</sub>s<sub>jk</sub></li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h3 class="text-xl font-semibold mb-4">Constellation Diagrams</h3>
+                        <p class="text-slate-600 mb-4">A constellation diagram is a representation of a signal modulated by a digital modulation scheme in the complex plane, showing the signal as a collection of points.</p>
+                        
+                        <div class="bg-slate-50 p-4 rounded-lg">
+                            <h4 class="font-semibold mb-3">Common Constellations:</h4>
+                            <div class="space-y-2">
+                                <div class="flex items-center">
+                                    <span class="w-20 font-semibold text-sm">BPSK:</span>
+                                    <span class="text-sm text-slate-600">2 points on real axis</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <span class="w-20 font-semibold text-sm">QPSK:</span>
+                                    <span class="text-sm text-slate-600">4 points at ±45°, ±135°</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <span class="w-20 font-semibold text-sm">16-QAM:</span>
+                                    <span class="text-sm text-slate-600">4×4 grid in I-Q plane</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <span class="w-20 font-semibold text-sm">8-PSK:</span>
+                                    <span class="text-sm text-slate-600">8 points equally spaced on circle</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Orthogonal Symbols & Gram-Schmidt Section -->
+        <section id="orthogonal">
+            <div class="bg-white p-8 rounded-xl shadow-lg">
+                <h2 class="text-3xl font-bold mb-6 text-center">Orthogonal Symbols & Gram-Schmidt Orthogonalization</h2>
+                
+                <div class="mb-8">
+                    <h3 class="text-2xl font-semibold mb-4">Orthogonal Signals</h3>
+                    <p class="text-slate-600 mb-4">Two signals s<sub>1</sub>(t) and s<sub>2</sub>(t) are orthogonal if their inner product is zero:</p>
+                    
+                    <div class="bg-slate-100 p-4 rounded-lg mb-4 text-center">
+                        <span class="font-mono">⟨s<sub>1</sub>(t), s<sub>2</sub>(t)⟩ = ∫ s<sub>1</sub>(t)s<sub>2</sub>(t)dt = 0</span>
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="p-4 bg-slate-50 rounded-lg">
+                            <h4 class="font-bold mb-2">Properties of Orthogonal Signals</h4>
+                            <ul class="list-disc list-inside text-slate-600 space-y-1 text-sm">
+                                <li>No mutual interference</li>
+                                <li>Optimal for signal separation</li>
+                                <li>Minimize error probability</li>
+                                <li>Maximum Euclidean distance</li>
+                            </ul>
+                        </div>
+                        <div class="p-4 bg-slate-50 rounded-lg">
+                            <h4 class="font-bold mb-2">Examples</h4>
+                            <ul class="list-disc list-inside text-slate-600 space-y-1 text-sm">
+                                <li>sin(ω<sub>c</sub>t) and cos(ω<sub>c</sub>t)</li>
+                                <li>Walsh functions</li>
+                                <li>Orthogonal frequency carriers (OFDM)</li>
+                                <li>Spreading codes (CDMA)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="text-2xl font-semibold mb-4">Gram-Schmidt Orthogonalization Process</h3>
+                    <p class="text-slate-600 mb-4">The Gram-Schmidt process is a method for orthonormalizing a set of vectors in an inner product space. It's fundamental in constructing orthonormal basis functions for signal representation.</p>
+                    
+                    <div class="bg-indigo-50 border-l-4 border-indigo-600 p-4 mb-6">
+                        <h4 class="font-bold text-indigo-900 mb-2">Algorithm Steps:</h4>
+                        <ol class="list-decimal list-inside text-slate-700 space-y-2">
+                            <li><strong>Initialize:</strong> φ<sub>1</sub>(t) = s<sub>1</sub>(t) / ||s<sub>1</sub>(t)||</li>
+                            <li><strong>For each signal s<sub>i</sub>(t):</strong>
+                                <ul class="list-disc list-inside ml-6 mt-1 text-sm">
+                                    <li>Project s<sub>i</sub>(t) onto existing basis functions</li>
+                                    <li>Subtract projections: v<sub>i</sub>(t) = s<sub>i</sub>(t) - Σ⟨s<sub>i</sub>, φ<sub>j</sub>⟩φ<sub>j</sub>(t)</li>
+                                    <li>Normalize: φ<sub>i</sub>(t) = v<sub>i</sub>(t) / ||v<sub>i</sub>(t)||</li>
+                                </ul>
+                            </li>
+                            <li><strong>Result:</strong> Orthonormal basis set {φ<sub>1</sub>(t), φ<sub>2</sub>(t), ..., φ<sub>N</sub>(t)}</li>
+                        </ol>
+                    </div>
+
+                    <div class="text-center">
+                        <a href="../Gram-Schmidt Orthonormalization Process/index2.html" 
+                           class="inline-flex items-center bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition-colors shadow-lg">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                            </svg>
+                            Interactive Gram-Schmidt Demo
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Baseband Transmission Section -->
+        <section id="baseband">
+            <div class="bg-white p-8 rounded-xl shadow-lg">
+                <h2 class="text-3xl font-bold mb-6 text-center">Baseband Signal Transmission through Bandlimited Channels</h2>
+                
+                <div class="mb-8">
+                    <h3 class="text-2xl font-semibold mb-4">Intersymbol Interference (ISI)</h3>
+                    <p class="text-slate-600 mb-4">ISI occurs when a pulse spreads beyond its allocated time slot, causing it to interfere with neighboring pulses. This is a major impairment in digital communication systems.</p>
+                    
+                    <div class="grid md:grid-cols-2 gap-6 mb-6">
+                        <div class="p-4 bg-red-50 border-l-4 border-red-500 rounded">
+                            <h4 class="font-bold text-red-900 mb-2">Causes of ISI</h4>
+                            <ul class="list-disc list-inside text-slate-700 space-y-1 text-sm">
+                                <li>Bandlimited channels</li>
+                                <li>Multipath propagation</li>
+                                <li>Non-ideal filters</li>
+                                <li>Timing errors</li>
+                            </ul>
+                        </div>
+                        <div class="p-4 bg-amber-50 border-l-4 border-amber-500 rounded">
+                            <h4 class="font-bold text-amber-900 mb-2">Effects of ISI</h4>
+                            <ul class="list-disc list-inside text-slate-700 space-y-1 text-sm">
+                                <li>Increased bit error rate (BER)</li>
+                                <li>Reduced data rate</li>
+                                <li>Performance degradation</li>
+                                <li>Detection errors</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-100 p-4 rounded-lg">
+                        <h4 class="font-bold mb-2">Mathematical Representation</h4>
+                        <p class="font-mono text-sm mb-2">y(t) = Σ a<sub>k</sub>h(t - kT) + n(t)</p>
+                        <p class="text-xs text-slate-600">Sampled at t = nT: y<sub>n</sub> = a<sub>n</sub>h<sub>0</sub> + Σ<sub>k≠n</sub> a<sub>k</sub>h<sub>n-k</sub> + n<sub>n</sub></p>
+                        <p class="text-xs text-slate-600 mt-2">Where the second term represents ISI</p>
+                    </div>
+                </div>
+
+                <div class="mb-8">
+                    <h3 class="text-2xl font-semibold mb-4">Receiver Output in the Presence of ISI</h3>
+                    <p class="text-slate-600 mb-4">The received signal at the sampler output contains the desired symbol plus interference from other symbols:</p>
+                    
+                    <div class="bg-slate-100 p-4 rounded-lg mb-4">
+                        <p class="font-mono text-center">r<sub>k</sub> = a<sub>k</sub> + Σ<sub>i≠k</sub> a<sub>i</sub>h(kT - iT) + n<sub>k</sub></p>
+                        <div class="grid grid-cols-3 gap-2 mt-3 text-xs text-center">
+                            <div class="bg-green-100 p-2 rounded">
+                                <span class="font-semibold">Desired Signal</span>
+                            </div>
+                            <div class="bg-red-100 p-2 rounded">
+                                <span class="font-semibold">ISI Term</span>
+                            </div>
+                            <div class="bg-blue-100 p-2 rounded">
+                                <span class="font-semibold">Noise</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-8">
+                    <h3 class="text-2xl font-semibold mb-4">Zero ISI: Nyquist Criterion</h3>
+                    <p class="text-slate-600 mb-4">Zero ISI can be achieved if the overall channel-pulse response satisfies the Nyquist criterion for zero ISI:</p>
+                    
+                    <div class="bg-emerald-50 border-l-4 border-emerald-600 p-4 mb-4">
+                        <h4 class="font-bold text-emerald-900 mb-3">Nyquist First Criterion</h4>
+                        <p class="font-mono text-center mb-2">h(nT) = { 1, n = 0; 0, n ≠ 0 }</p>
+                        <p class="text-sm text-slate-700">The pulse response must be 1 at the sampling instant and 0 at all other sampling instants</p>
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="p-4 bg-slate-50 rounded-lg">
+                            <h4 class="font-bold mb-2">Raised Cosine Filter</h4>
+                            <p class="text-sm text-slate-600 mb-2">Most popular pulse shape satisfying Nyquist criterion:</p>
+                            <ul class="list-disc list-inside text-slate-600 space-y-1 text-xs">
+                                <li>Roll-off factor α (0 ≤ α ≤ 1)</li>
+                                <li>Bandwidth: B = (1+α)/(2T)</li>
+                                <li>Zero ISI at sampling instants</li>
+                                <li>Practical implementation</li>
+                            </ul>
+                        </div>
+                        <div class="p-4 bg-slate-50 rounded-lg">
+                            <h4 class="font-bold mb-2">Equalization Techniques</h4>
+                            <p class="text-sm text-slate-600 mb-2">Methods to combat ISI:</p>
+                            <ul class="list-disc list-inside text-slate-600 space-y-1 text-xs">
+                                <li>Zero-forcing equalizer</li>
+                                <li>MMSE (Minimum Mean Square Error)</li>
+                                <li>Decision feedback equalizer (DFE)</li>
+                                <li>Adaptive equalization</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="text-2xl font-semibold mb-4">Controlled ISI: Partial Response Signaling</h3>
+                    <p class="text-slate-600 mb-4">Instead of eliminating ISI completely, controlled ISI introduces a known amount of interference to achieve higher data rates or better spectral efficiency.</p>
+                    
+                    <div class="grid md:grid-cols-3 gap-4">
+                        <div class="p-4 bg-purple-50 rounded-lg">
+                            <h4 class="font-bold text-purple-900 mb-2">Duobinary (Class 1)</h4>
+                            <p class="text-sm text-slate-600 mb-2">h(t) = p(t) + p(t-T)</p>
+                            <ul class="list-disc list-inside text-slate-600 space-y-1 text-xs">
+                                <li>3 levels: -2, 0, +2</li>
+                                <li>Bandwidth: R/2</li>
+                                <li>Spectral efficiency: 2 bits/s/Hz</li>
+                            </ul>
+                        </div>
+                        <div class="p-4 bg-blue-50 rounded-lg">
+                            <h4 class="font-bold text-blue-900 mb-2">Modified Duobinary</h4>
+                            <p class="text-sm text-slate-600 mb-2">h(t) = p(t) - p(t-2T)</p>
+                            <ul class="list-disc list-inside text-slate-600 space-y-1 text-xs">
+                                <li>3 levels: -2, 0, +2</li>
+                                <li>No DC component</li>
+                                <li>Better for AC-coupled channels</li>
+                            </ul>
+                        </div>
+                        <div class="p-4 bg-indigo-50 rounded-lg">
+                            <h4 class="font-bold text-indigo-900 mb-2">Advantages</h4>
+                            <ul class="list-disc list-inside text-slate-600 space-y-1 text-xs">
+                                <li>Reduced bandwidth</li>
+                                <li>Better spectral efficiency</li>
+                                <li>Tolerant to timing jitter</li>
+                                <li>Simple implementation</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 bg-gradient-to-r from-slate-50 to-gray-50 p-6 rounded-lg">
+                        <h4 class="font-bold mb-2">Precoding for Partial Response</h4>
+                        <p class="text-sm text-slate-600 mb-3">To avoid error propagation in detection, precoding is used before partial response shaping:</p>
+                        <div class="bg-white p-3 rounded border border-slate-200">
+                            <p class="font-mono text-sm text-center">d<sub>k</sub> = a<sub>k</sub> ⊕ d<sub>k-1</sub> (for duobinary)</p>
+                            <p class="text-xs text-slate-600 text-center mt-2">Where ⊕ represents modulo-2 addition</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-slate-100 py-12">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-8">
+                <h3 class="text-xl font-bold text-slate-800 mb-4">Connect with the Creator</h3>
+                <div class="flex justify-center space-x-4 flex-wrap gap-2">
+                    <a href="https://www.linkedin.com/in/affan-danish-08a144353/" target="_blank" 
+                    class="group bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl transition-all duration-300 flex items-center space-x-3 transform hover:scale-105 shadow-lg hover:shadow-xl">
+                        <svg class="w-5 h-5 group-hover:rotate-12 transition-transform" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                        </svg>
+                        <div class="text-left">
+                            <div class="font-semibold">LinkedIn</div>
+                            <div class="text-xs opacity-80">Professional Network</div>
+                        </div>
+                    </a>
+
+                    <a href="https://github.com/AffanMhz/Digital_Communication_v2" target="_blank" 
+                    class="group bg-gray-800 hover:bg-gray-900 text-white px-6 py-3 rounded-xl transition-all duration-300 flex items-center space-x-3 transform hover:scale-105 shadow-lg hover:shadow-xl">
+                    <svg class="w-6 h-6 group-hover:rotate-12 transition-transform" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path fill-rule="evenodd" clip-rule="evenodd" 
+                            d="M12 .297a12 12 0 00-3.794 23.405c.6.111.82-.26.82-.577 
+                            0-.285-.01-1.04-.015-2.04-3.338.726-4.042-1.61-4.042-1.61
+                            -.546-1.387-1.333-1.756-1.333-1.756-1.09-.75.084-.735.084-.735
+                            1.205.084 1.84 1.236 1.84 1.236 1.07 1.835 2.807 1.305 
+                            3.492.998.108-.776.42-1.305.762-1.605-2.665-.3-5.466-1.332-5.466-5.932
+                            0-1.31.465-2.382 1.235-3.222-.135-.303-.54-1.523.105-3.176 
+                            0 0 1.005-.322 3.3 1.23a11.5 11.5 0 016 0c2.28-1.552 
+                            3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 
+                            1.23 1.912 1.23 3.222 0 4.61-2.805 5.625-5.475 5.92.435.375.825 1.102.825 2.222
+                            0 1.606-.015 2.896-.015 3.286 0 .315.21.694.825.573A12.005 
+                            12.005 0 0012 .297z" />
+                    </svg>
+                    <div class="text-left">
+                        <div class="font-semibold">GitHub</div>
+                        <div class="text-xs opacity-80">Explore Projects</div>
+                    </div>
+                </a>
+
+                    <a href="mailto:Affan2304788@st.jmi.ac.in" 
+                    class="group bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-xl transition-all duration-300 flex items-center space-x-3 transform hover:scale-105 shadow-lg hover:shadow-xl">
+                        <svg class="w-5 h-5 group-hover:bounce" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-.904.732-1.636 1.636-1.636h.917l9.447 7.096 9.447-7.096h.917A1.636 1.636 0 0 1 24 5.457z"/>
+                        </svg>
+                        <div class="text-left">
+                            <div class="font-semibold">Email</div>
+                            <div class="text-xs opacity-80">Direct Contact</div>
+                        </div>
+                    </a>
+
+                    <a href="https://x.com/AffanMhz" target="_blank" 
+                    class="group bg-sky-500 hover:bg-sky-600 text-white px-6 py-3 rounded-xl transition-all duration-300 flex items-center space-x-3 transform hover:scale-105 shadow-lg hover:shadow-xl">
+                        <svg class="w-5 h-5 group-hover:rotate-12 transition-transform" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0 .42-.015.63A9.935 9.935 0 0024 4.59z"/>
+                        </svg>
+                        <div class="text-left">
+                            <div class="font-semibold">Twitter/X</div>
+                            <div class="text-xs opacity-80">Latest Updates</div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <div class="border-t border-slate-300 pt-8 text-center">
+                <p class="text-slate-600 mb-2">A learning resource on Digital Communication & Digital Signal Processing</p>
+                <p class="text-slate-800 font-semibold">Created with ❤️ by <a href="https://www.linkedin.com/in/affan-danish-08a144353/" target="_blank" class="text-indigo-600 hover:text-indigo-800 transition-colors">Affan Danish</a></p>
+                <p class="text-xs text-slate-500 mt-2">© 2025 Affan Danish. All Rights Reserved.</p>
+                <p class="text-xs text-slate-400 mt-1">JMI | Electronics & Communication Engineering</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+    // Mobile menu toggle
+    document.addEventListener('DOMContentLoaded', function() {
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        
+        if (mobileMenuButton && mobileMenu) {
+            mobileMenuButton.addEventListener('click', function() {
+                mobileMenu.classList.toggle('hidden');
+            });
+        }
+
+        // Active navigation link
+        const navLinks = document.querySelectorAll('.nav-link');
+        const sections = document.querySelectorAll('section');
+
+        function updateActiveLink() {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (scrollY >= sectionTop - 100) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active-nav');
+                if (link.getAttribute('href') === `#${current}`) {
+                    link.classList.add('active-nav');
+                }
+            });
+        }
+
+        window.addEventListener('scroll', updateActiveLink);
+        updateActiveLink();
+    });
+
+    // Dark Mode Toggle Functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        const darkModeToggleMobile = document.getElementById('darkModeToggleMobile');
+        const html = document.documentElement;
+        
+        // Check current dark mode state and update buttons
+        function updateDarkModeButtons() {
+            const isDark = html.classList.contains('dark-mode');
+            
+            // Update desktop button
+            if (darkModeToggle) {
+                const moonIcon = darkModeToggle.querySelector('span:first-child');
+                const text = darkModeToggle.querySelector('span:last-child');
+                
+                if (isDark) {
+                    moonIcon.textContent = '☀️';
+                    if (text) text.textContent = 'Light';
+                    darkModeToggle.title = 'Switch to Light Mode (Ctrl+D)';
+                } else {
+                    moonIcon.textContent = '🌙';
+                    if (text) text.textContent = 'Dark';
+                    darkModeToggle.title = 'Switch to Dark Mode (Ctrl+D)';
+                }
+            }
+            
+            // Update mobile button
+            if (darkModeToggleMobile) {
+                const mobileMoonIcon = darkModeToggleMobile.querySelector('span:first-child');
+                const mobileText = darkModeToggleMobile.querySelector('span:nth-child(2)');
+                
+                if (isDark) {
+                    mobileMoonIcon.textContent = '☀️';
+                    if (mobileText) mobileText.textContent = 'Toggle Light Mode';
+                    darkModeToggleMobile.setAttribute('aria-label', 'Switch to Light Mode');
+                } else {
+                    mobileMoonIcon.textContent = '🌙';
+                    if (mobileText) mobileText.textContent = 'Toggle Dark Mode';
+                    darkModeToggleMobile.setAttribute('aria-label', 'Switch to Dark Mode');
+                }
+            }
+        }
+        
+        // Toggle dark mode
+        function toggleDarkMode() {
+            const isDark = html.classList.contains('dark-mode');
+            const themeColorMeta = document.querySelector('meta[name="theme-color"]');
+            
+            if (isDark) {
+                html.classList.remove('dark-mode');
+                if (document.body) document.body.classList.remove('dark-mode');
+                document.documentElement.style.colorScheme = 'light';
+                localStorage.setItem('dark-mode', 'false');
+                if (themeColorMeta) themeColorMeta.setAttribute('content', '#dfdff3');
+            } else {
+                html.classList.add('dark-mode');
+                if (document.body) document.body.classList.add('dark-mode');
+                document.documentElement.style.colorScheme = 'dark';
+                localStorage.setItem('dark-mode', 'true');
+                if (themeColorMeta) themeColorMeta.setAttribute('content', '#0f172a');
+            }
+            
+            updateDarkModeButtons();
+        }
+        
+        // Event listeners for dark mode
+        if (darkModeToggle) {
+            darkModeToggle.addEventListener('click', toggleDarkMode);
+        }
+        if (darkModeToggleMobile) {
+            darkModeToggleMobile.addEventListener('click', toggleDarkMode);
+        }
+        
+        // Keyboard shortcut (Ctrl+D)
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === 'd') {
+                e.preventDefault();
+                toggleDarkMode();
+            }
+        });
+        
+        // Initialize button states
+        updateDarkModeButtons();
+    });
+    </script>
+</body>
+</html>
